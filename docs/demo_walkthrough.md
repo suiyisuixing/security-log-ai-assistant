@@ -69,3 +69,21 @@ across every bundled sample log.
 14. In the **SOC Report** panel, click **Generate SOC Markdown Report**
     and **Copy Markdown**. This single document is what a SOC reviewer
     would receive.
+
+## v3 — Detection Engineering & Workflow demo
+
+15. Click **Load Evaluation Metrics** in the Detection Metrics panel.
+    Confirm precision/recall/F1 over all scenarios.
+16. Click **Load Detection Engineering Report** in the Rule Quality
+    panel. Inspect strengths/weaknesses for each rule.
+17. Click **Load Datasets** in the Dataset Evaluation panel. Choose
+    `multi_stage_intrusion` and click **Analyze Selected Dataset** —
+    confirm severity is `critical`.
+18. Click **Load Playbooks** and then **Recommend Playbooks**. Confirm
+    matching playbooks are listed with steps and containment actions.
+19. Click **Build Workflow** in the Analyst Workflow Simulation panel.
+    Confirm each high-severity case is walked through new → triaged →
+    investigating → contained.
+20. In Report Center v3, click each of **Executive Report**, **Analyst
+    Report**, and **Detection Engineering Report**. Copy each one with
+    the **Copy report** button.

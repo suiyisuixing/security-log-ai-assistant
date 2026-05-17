@@ -27,6 +27,12 @@ React dashboard.
 11. Read `docs/soc_workflow.md` to understand the v2 SOC pipeline.
 12. Open the Triage Queue, Cases, Entities, Kill Chain, Coverage, and Tuning panels in the UI.
 13. Generate the SOC Markdown report and read top-to-bottom — it summarizes everything the platform produces.
+14. Read `docs/v3_release_notes.md` for the Detection Engineering and SOC Workflow Platform features.
+15. Read `docs/detection_engineering.md` and `docs/detection_as_code.md` to see how rules are graded and contributed.
+16. Open the Detection Metrics panel — confirm precision/recall/F1 over the synthetic scenarios.
+17. Open Dataset Evaluation and analyze each of the six synthetic datasets.
+18. Open Playbook Recommendations and Workflow Simulation panels.
+19. Generate the Executive, Analyst, and Detection Engineering Markdown reports.
 
 ## What to look for
 

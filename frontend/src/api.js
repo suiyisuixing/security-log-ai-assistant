@@ -55,4 +55,25 @@ export const api = {
     jsonRequest('/report/soc-json', { method: 'POST', body: JSON.stringify({ source_type: sourceType, raw_logs: raw }) }),
   reportSocMarkdown: (sourceType, raw) =>
     jsonRequest('/report/soc-markdown', { method: 'POST', body: JSON.stringify({ source_type: sourceType, raw_logs: raw }) }),
+  // v3
+  datasets: () => jsonRequest('/datasets'),
+  datasetContent: (id) => jsonRequest(`/datasets/${encodeURIComponent(id)}`),
+  datasetAnalyze: (id) => jsonRequest(`/datasets/analyze/${encodeURIComponent(id)}`, { method: 'POST' }),
+  detectionEngineeringRules: () => jsonRequest('/detection-engineering/rules'),
+  detectionEngineeringReport: () => jsonRequest('/detection-engineering/report'),
+  detectionEngineeringMetrics: () => jsonRequest('/detection-engineering/metrics'),
+  metricsEvaluation: () => jsonRequest('/metrics/evaluation'),
+  metricsRules: () => jsonRequest('/metrics/rules'),
+  playbooks: () => jsonRequest('/playbooks'),
+  playbooksRecommend: (logType, raw) =>
+    jsonRequest('/playbooks/recommend', { method: 'POST', body: JSON.stringify({ log_type: logType, raw_logs: raw }) }),
+  workflowSample: () => jsonRequest('/workflow/sample'),
+  workflowSimulate: (logType, raw) =>
+    jsonRequest('/workflow/simulate', { method: 'POST', body: JSON.stringify({ log_type: logType, raw_logs: raw }) }),
+  reportExecutive: (sourceType, raw) =>
+    jsonRequest('/report/executive', { method: 'POST', body: JSON.stringify({ source_type: sourceType, raw_logs: raw }) }),
+  reportAnalyst: (sourceType, raw) =>
+    jsonRequest('/report/analyst', { method: 'POST', body: JSON.stringify({ source_type: sourceType, raw_logs: raw }) }),
+  reportDetectionEngineering: () =>
+    jsonRequest('/report/detection-engineering', { method: 'POST' }),
 }

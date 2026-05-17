@@ -20,9 +20,18 @@ from .cases import create_cases_from_alerts, summarize_cases
 from .config import ALLOWED_LOG_NAMES, resolve_sample_log
 from .correlation import correlate_findings
 from .coverage import build_detection_coverage_matrix, summarize_coverage
+from .detection_engineering import (
+    build_detection_engineering_report,
+    explain_rule,
+    rule_quality_score,
+)
 from .detectors import detect_events, load_detection_rules
 from .entities import build_entity_profiles, summarize_entities
 from .evaluation import (
+    analyze_dataset,
+    evaluate_datasets,
+    get_dataset_metadata,
+    list_datasets,
     load_scenarios,
     run_all_detection_scenarios,
     run_one_scenario,
@@ -32,9 +41,23 @@ from .false_positive import (
     summarize_false_positive_review,
 )
 from .kill_chain import build_kill_chain_view
+from .metrics import (
+    calculate_category_metrics,
+    calculate_detection_metrics,
+    calculate_rule_metrics,
+    summarize_metrics,
+)
 from .mitre import enrich_findings_with_mitre, list_techniques, load_mitre_mapping
 from .parsers import parse_log_file, parse_raw_logs, source_type_for_sample
+from .playbooks import (
+    load_playbooks,
+    recommend_playbooks,
+    summarize_playbook_recommendations,
+)
 from .reporting import (
+    build_analyst_report,
+    build_detection_engineering_report_markdown,
+    build_executive_report,
     build_incident_report,
     build_markdown_report,
     build_soc_markdown_report,
@@ -52,6 +75,10 @@ from .schemas import (
     ParsedEvent,
 )
 from .triage import generate_alerts_from_findings, summarize_alert_queue
+from .workflow import (
+    generate_workflow_summary,
+    simulate_soc_workflow,
+)
 
 
 class V2AnalyzeRequest(BaseModel):
@@ -385,6 +412,153 @@ def create_app() -> FastAPI:
         soc = build_soc_report(events, findings)
         return {"markdown": build_soc_markdown_report(soc)}
 
+    # ---------- v3 endpoints ----------
+
+    @app.get("/datasets")
+    def datasets_list() -> dict:
+        return {"datasets": list_datasets()}
+
+    @app.get("/datasets/{dataset_id}")
+    def dataset_content(dataset_id: str) -> dict:
+        meta = get_dataset_metadata(dataset_id)
+        if meta is None:
+            raise HTTPException(status_code=404, detail="dataset not found")
+        try:
+            from .config import resolve_dataset
+            path = resolve_dataset(dataset_id)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        return {
+            "metadata": meta,
+            "content": path.read_text(encoding="utf-8"),
+        }
+
+    @app.post("/datasets/analyze/{dataset_id}")
+    def datasets_analyze(dataset_id: str) -> dict:
+        try:
+            return analyze_dataset(dataset_id)
+        except ValueError:
+            raise HTTPException(status_code=404, detail="dataset not found")
+
+    @app.get("/detection-engineering/rules")
+    def detection_engineering_rules() -> dict:
+        rules = load_detection_rules()
+        return {
+            "rule_quality": [rule_quality_score(r) for r in rules],
+            "rule_explanations": [explain_rule(r) for r in rules],
+        }
+
+    @app.get("/detection-engineering/report")
+    def detection_engineering_report() -> dict:
+        return build_detection_engineering_report()
+
+    @app.get("/detection-engineering/metrics")
+    def detection_engineering_metrics() -> dict:
+        report = build_detection_engineering_report()
+        return {
+            "rule_count": report["rule_count"],
+            "average_quality_score": report["average_quality_score"],
+            "quality_distribution": report["quality_distribution"],
+            "coverage_summary": report["coverage_summary"],
+            "evaluation_metrics": report["evaluation_metrics"],
+            "summary": report["summary"],
+        }
+
+    @app.get("/metrics/evaluation")
+    def metrics_evaluation() -> dict:
+        evaluation = run_all_detection_scenarios()
+        m = calculate_detection_metrics(evaluation)
+        cat = calculate_category_metrics(evaluation)
+        return {
+            "metrics": m,
+            "category_metrics": cat,
+            "summary": summarize_metrics(m),
+        }
+
+    @app.get("/metrics/rules")
+    def metrics_rules() -> dict:
+        return {"rule_metrics": calculate_rule_metrics()}
+
+    @app.get("/playbooks")
+    def playbooks_list() -> dict:
+        return {"playbooks": load_playbooks()}
+
+    @app.post("/playbooks/recommend")
+    def playbooks_recommend(req: V2AnalyzeRequest) -> dict:
+        try:
+            events = parse_raw_logs(req.log_type, req.raw_logs)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        findings = detect_events(events)
+        enrich_findings_with_mitre(findings)
+        for f in findings:
+            score_finding(f)
+        recs = recommend_playbooks(findings)
+        return {
+            "recommendations": recs,
+            "summary": summarize_playbook_recommendations(recs),
+        }
+
+    @app.get("/workflow/sample")
+    def workflow_sample() -> dict:
+        events, findings = _findings_for_all_samples()
+        alerts = generate_alerts_from_findings(findings)
+        annotate_alerts_with_fp_likelihood(alerts)
+        correlated = correlate_findings(findings)
+        from .cases import create_cases_from_alerts
+        cases = create_cases_from_alerts(alerts, correlated)
+        cases, steps = simulate_soc_workflow(cases, alerts)
+        return {
+            "cases": [c.model_dump() for c in cases],
+            "steps": steps,
+            "summary": generate_workflow_summary(cases),
+        }
+
+    @app.post("/workflow/simulate")
+    def workflow_simulate(req: V2AnalyzeRequest) -> dict:
+        try:
+            events = parse_raw_logs(req.log_type, req.raw_logs)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        findings = detect_events(events)
+        enrich_findings_with_mitre(findings)
+        for f in findings:
+            score_finding(f)
+        alerts = generate_alerts_from_findings(findings)
+        annotate_alerts_with_fp_likelihood(alerts)
+        correlated = correlate_findings(findings)
+        from .cases import create_cases_from_alerts
+        cases = create_cases_from_alerts(alerts, correlated)
+        cases, steps = simulate_soc_workflow(cases, alerts)
+        return {
+            "cases": [c.model_dump() for c in cases],
+            "steps": steps,
+            "summary": generate_workflow_summary(cases),
+        }
+
+    @app.post("/report/executive")
+    def report_executive(req: AnalyzeRequest) -> dict:
+        try:
+            events = parse_raw_logs(req.source_type, req.raw_logs)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        findings = detect_events(events)
+        return {"markdown": build_executive_report(events, findings)}
+
+    @app.post("/report/analyst")
+    def report_analyst(req: AnalyzeRequest) -> dict:
+        try:
+            events = parse_raw_logs(req.source_type, req.raw_logs)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        findings = detect_events(events)
+        return {"markdown": build_analyst_report(events, findings)}
+
+    @app.post("/report/detection-engineering")
+    def report_detection_engineering() -> dict:
+        report = build_detection_engineering_report()
+        return {"markdown": build_detection_engineering_report_markdown(report)}
+
     @app.get("/api/surface")
     def api_surface() -> dict:
         return {
@@ -417,6 +591,21 @@ def create_app() -> FastAPI:
                 {"method": "GET", "path": "/coverage/mitre"},
                 {"method": "POST", "path": "/report/soc-json"},
                 {"method": "POST", "path": "/report/soc-markdown"},
+                {"method": "GET", "path": "/datasets"},
+                {"method": "GET", "path": "/datasets/{dataset_id}"},
+                {"method": "POST", "path": "/datasets/analyze/{dataset_id}"},
+                {"method": "GET", "path": "/detection-engineering/rules"},
+                {"method": "GET", "path": "/detection-engineering/report"},
+                {"method": "GET", "path": "/detection-engineering/metrics"},
+                {"method": "GET", "path": "/metrics/evaluation"},
+                {"method": "GET", "path": "/metrics/rules"},
+                {"method": "GET", "path": "/playbooks"},
+                {"method": "POST", "path": "/playbooks/recommend"},
+                {"method": "GET", "path": "/workflow/sample"},
+                {"method": "POST", "path": "/workflow/simulate"},
+                {"method": "POST", "path": "/report/executive"},
+                {"method": "POST", "path": "/report/analyst"},
+                {"method": "POST", "path": "/report/detection-engineering"},
                 {"method": "GET", "path": "/api/surface"},
             ]
         }

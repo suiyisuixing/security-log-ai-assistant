@@ -1,6 +1,6 @@
 # Project Status
 
-- Version: v2.0-rc
+- Version: v3.0-rc
 - Date: 2026-05-17
 
 ## Completion
@@ -9,10 +9,14 @@
 | ---- | ------ |
 | FastAPI backend (v1) | done |
 | FastAPI backend (v2 SOC modules) | done |
+| FastAPI backend (v3 DE / metrics / workflow / playbooks / reports) | done |
 | React + Vite frontend (v1) | done |
 | React + Vite frontend (v2 SOC panels) | done |
+| React + Vite frontend (v3 DE / Workflow / Report Center) | done |
 | Sample logs (5 files) | done |
+| Synthetic datasets (6 files + manifest) | done |
 | Detection rules (20) | done |
+| Detection-as-code documentation | done |
 | MITRE ATT&CK mapping (12 techniques) | done |
 | Risk scoring | done |
 | Mock AI summarizer | done |
@@ -28,16 +32,22 @@
 | Kill-chain view | done |
 | MITRE coverage matrix | done |
 | SOC analyst report (JSON + Markdown) | done |
-| Pytest suite (195 tests) | done |
+| Detection engineering layer | done |
+| Precision / Recall / F1 metrics | done |
+| Analyst workflow simulation | done |
+| Playbook library + recommender (8) | done |
+| Executive / Analyst / DE reports | done |
+| Pytest suite (284 tests) | done |
 | GitHub Actions CI | done |
-| Documentation set (v1 + v2) | done |
+| Documentation set (v1 + v2 + v3) | done |
 
 ## Known limitations
 
 - No persistent database.
 - No real LLM API integration; mock summarizer only.
-- Sample logs intentionally synthetic and small.
+- Synthetic datasets intentionally small.
+- Workflow simulator is deterministic; real analyst judgment is not modeled.
 
 ## Next step
 
-Optionally extend the rule pack and add screenshot images under `docs/screenshots/`.
+Optionally extend the playbook library and add screenshot images under `docs/screenshots/`.

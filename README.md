@@ -2,9 +2,12 @@
 
 ![CI](https://github.com/suiyisuixing/security-log-ai-assistant/actions/workflows/ci.yml/badge.svg)
 
-A local Security Operations Evaluation Platform for AI-assisted log
-analysis, alert triage, MITRE ATT&CK mapping, incident case management,
-detection evaluation, false-positive review, and SOC analyst reporting.
+A local Detection Engineering and SOC Workflow Platform that parses
+synthetic security logs, detects suspicious behavior, maps findings to
+MITRE ATT&CK, scores risk, builds triage queues and incident cases,
+evaluates detection coverage, simulates analyst workflows, recommends
+playbooks, and generates executive, analyst, and detection-engineering
+reports.
 
 ## Reviewer Quick Path
 
@@ -12,65 +15,65 @@ detection evaluation, false-positive review, and SOC analyst reporting.
 2. Run the backend (`uvicorn app.main:app --reload`) and frontend (`npm run dev`).
 3. In the UI, pick `mixed_security_events.log`, click **Analyze**, then explore the dashboard.
 4. Use the v2 panels (Triage, Cases, Entities, Kill Chain, Coverage, Tuning, SOC Report).
-5. Run `pytest` to confirm all 195 tests pass.
-6. Run `python tools/run_checks.py` to run the full validation suite (pytest + compileall + frontend build).
-7. Read [docs/reviewer_guide.md](docs/reviewer_guide.md) for the structured walkthrough.
+5. Use the v3 panels (Detection Metrics, Rule Quality, Dataset Evaluation, Playbooks, Workflow, Report Center).
+6. Run `pytest` to confirm all 284 tests pass.
+7. Run `python tools/run_checks.py` to run the full validation suite (pytest + compileall + frontend build).
+8. Read [docs/reviewer_guide.md](docs/reviewer_guide.md) for the structured walkthrough.
 
-## v2.0 SOC Workflow
+## v3.0 Detection Engineering and SOC Workflow Platform
 
 ```
-Raw logs -> Parse -> Detect -> Findings
-                                |
-                                v
-                Alerts (priority + FP estimate)
-                                |
-                                v
-            Triage queue summary + filters
-                                |
-                                v
-              Cases (per-actor, classified)
-                                |
-                                v
-                Entity profiles (risk-scored)
-                                |
-                                v
-            Kill-chain view + MITRE coverage
-                                |
-                                v
-             SOC report (JSON + Markdown)
+Synthetic datasets
+       │
+       v
+   Detection rules (rules.json, quality-scored)
+       │
+       v
+   Findings → Alerts → Cases
+       │         │       │
+       v         v       v
+     Risk    Triage   Workflow simulation
+                       │
+                       v
+     Reports: Executive / Analyst / Detection Engineering / SOC
 ```
 
-See [docs/soc_workflow.md](docs/soc_workflow.md).
+See [docs/v3_release_notes.md](docs/v3_release_notes.md).
 
 ## Features
 
 ### v1 (unchanged)
 - Parses authentication, web access, firewall, DNS, and mixed log formats.
-- 20+ detection rules covering brute force, injection, scanning, beaconing, etc.
-- Local MITRE ATT&CK mapping (12 techniques) — no external fetch.
-- Risk scoring with severity normalization.
-- Local mock AI-style summarizer (no external LLM call).
-- Timeline reconstruction and per-actor incident correlation.
+- 20+ detection rules; 12 MITRE techniques; local-only mapping.
+- Risk scoring, timeline reconstruction, correlation engine.
 - JSON and Markdown incident reports.
-- Detection evaluation harness with 12+ named scenarios.
+- Detection evaluation harness (12+ scenarios).
 - React + Vite analyst dashboard.
 
-### v2 (new)
-- **Alert triage queue** with P1-P4 priorities, queue summaries, and filtering.
-- **Incident case management** classified as brute_force / web_attack /
-  network_scan / dns_beacon / privilege_escalation / multi_stage_incident.
-- **Entity risk profiles** for IPs, usernames, domains, and paths.
-- **Kill-chain view** mapping MITRE tactics to canonical lifecycle stages.
-- **Detection coverage matrix** showing per-technique rule mapping.
-- **False-positive review** with likelihood scoring.
-- **Rule tuning** with performance, recommendations, and detection gaps.
-- **SOC analyst report** (JSON + Markdown) combining all the above.
-- Frontend SOC Dashboard v2 with eight new panels.
-- 195 pytest tests (was 113) + GitHub Actions CI.
+### v2 (unchanged)
+- Alert triage queue with P1-P4 priorities and FP scoring.
+- Incident case management with classification and recommended actions.
+- Entity risk profiles (IP / user / domain / path).
+- Kill-chain view mapping MITRE tactics to lifecycle stages.
+- Detection coverage matrix.
+- Rule tuning with performance + gap analysis.
+- SOC analyst report (JSON + Markdown).
 
-## Architecture
-
-See [docs/architecture.md](docs/architecture.md).
+### v3 (new)
+- **Detection Engineering Layer**: rule quality scoring, plain-English
+  explanations, schema validation, gap analysis, improvement plans.
+- **Detection-as-Code**: documented schema, contribution flow, and
+  safe-data policy in [docs/detection_as_code.md](docs/detection_as_code.md).
+- **Synthetic Attack Dataset v3**: six new local datasets covering
+  benign baseline, brute-force, web attacks, DNS beacons, multi-stage
+  intrusion, and noisy false-positive scenarios.
+- **Precision / Recall / F1 metrics** per rule, per scenario category,
+  and overall.
+- **Analyst Workflow Simulation** with a six-state machine.
+- **Playbook Recommendations** from 8 educational response playbooks.
+- **Executive / Analyst / Detection Engineering Reports** as Markdown.
+- Six new frontend panels.
+- 284 pytest tests (was 195) + GitHub Actions CI.
 
 ## Quick Start
 
@@ -94,59 +97,65 @@ npm run dev
 
 Open http://localhost:5173.
 
-## Sample Logs
+## Synthetic Attack Datasets
 
-Five hand-crafted local sample logs live in `data/sample_logs/`. All IPs
-are RFC 5737 test addresses or RFC 1918 private addresses. No real
-production targets are referenced. See [docs/dataset.md](docs/dataset.md).
+Six local datasets in `data/datasets/`. All IPs are RFC 5737 test
+addresses or RFC 1918 private addresses. See
+[docs/dataset_evaluation.md](docs/dataset_evaluation.md).
 
 ## API Overview
 
-See [docs/api_surface.md](docs/api_surface.md). v2 highlights:
+See [docs/api_surface.md](docs/api_surface.md). v3 highlights:
 
 | Method | Path | Purpose |
 | ------ | ---- | ------- |
-| GET    | `/triage/sample` | alert queue for all bundled samples |
-| POST   | `/triage/analyze` | triage analyst-supplied raw logs |
-| GET    | `/cases/sample` | cases for all bundled samples |
-| POST   | `/cases/from-analysis` | cases from analyst input |
-| POST   | `/false-positive/review` | FP-annotated alerts |
-| GET    | `/rules/tuning` | per-rule performance + suggestions |
-| GET    | `/entities/sample` | risk-scored entities |
-| POST   | `/entities/analyze` | entities from analyst input |
-| GET    | `/kill-chain/sample` | kill-chain view |
-| POST   | `/kill-chain/analyze` | kill-chain from analyst input |
-| GET    | `/coverage/mitre` | MITRE coverage matrix |
-| POST   | `/report/soc-json` | SOC report (JSON) |
-| POST   | `/report/soc-markdown` | SOC report (Markdown) |
+| GET    | `/datasets` | list synthetic datasets |
+| POST   | `/datasets/analyze/{id}` | analyze a dataset |
+| GET    | `/detection-engineering/report` | full DE report |
+| GET    | `/metrics/evaluation` | precision/recall/F1 |
+| GET    | `/playbooks` | list playbooks |
+| POST   | `/playbooks/recommend` | recommend playbooks |
+| GET    | `/workflow/sample` | simulated analyst workflow |
+| POST   | `/report/executive` | executive report (MD) |
+| POST   | `/report/analyst` | SOC analyst report (MD) |
+| POST   | `/report/detection-engineering` | DE report (MD) |
 
-`GET /api/surface` returns the full inventory (29 endpoints).
+`GET /api/surface` returns the full inventory (44 endpoints).
 
-## Detection Rules
+## Detection Engineering
 
-20 rules in `data/detection_rules/rules.json`. See [docs/detection_methodology.md](docs/detection_methodology.md).
+20 rules in `data/detection_rules/rules.json`, each quality-scored and
+explained. See [docs/detection_engineering.md](docs/detection_engineering.md)
+and [docs/detection_as_code.md](docs/detection_as_code.md).
 
-## MITRE ATT&CK Mapping
+## Precision / Recall / F1 Metrics
 
-Local mapping for 12 techniques in `data/mitre/mitre_mapping.json`. See
-[docs/mitre_mapping.md](docs/mitre_mapping.md) and
-[docs/detection_coverage.md](docs/detection_coverage.md).
+Computed against scenarios in
+`data/evaluation/detection_scenarios.json`. Definitions:
 
-## Risk Scoring
+- TP: expected rule id present in matched rule ids.
+- FP: matched rule id NOT in expected.
+- FN: expected rule id NOT matched.
 
-Severity-baseline + event-count bonus + technique-coverage bonus, clamped to
-0-100. Overall incident score uses 0.7 * max + 0.3 * avg. Entity scoring
-adds an alert-count multiplier. See [docs/detection_methodology.md](docs/detection_methodology.md).
+See [docs/detection_methodology.md](docs/detection_methodology.md).
 
-## Incident Reports
+## Analyst Workflow Simulation
 
-`v1`: per-incident JSON and Markdown reports via `/report/json` and `/report/markdown`.
-`v2`: full SOC analyst report via `/report/soc-json` and `/report/soc-markdown`.
+Deterministic state machine over Cases. See
+[docs/soc_workflow_simulation.md](docs/soc_workflow_simulation.md).
 
-## Evaluation Suite
+## Playbook Recommendations
 
-12+ scenarios with explicit `expected_rule_ids`. Run via
-`POST /evaluation/run` or `python -m pytest tests/test_evaluation.py`.
+Eight educational SOC response playbooks. See
+[docs/playbooks.md](docs/playbooks.md).
+
+## Reports
+
+- v1: Incident JSON + Markdown.
+- v2: SOC JSON + Markdown.
+- v3: Executive Markdown, Analyst Markdown, Detection Engineering Markdown.
+
+See [docs/reporting_model.md](docs/reporting_model.md).
 
 ## Testing
 
@@ -154,15 +163,15 @@ adds an alert-count multiplier. See [docs/detection_methodology.md](docs/detecti
 .venv\Scripts\python.exe -m pytest
 ```
 
-**195 tests** pass with no skips and no xfails.
+**284 tests** pass with no skips and no xfails.
 
 ## Security Boundaries
 
-- All filesystem reads go through `resolve_sample_log`, which whitelists
-  the sample filenames and blocks `..`, `/`, and `\`.
-- No `subprocess` or `os.system` calls in the backend.
-- No external HTTP libraries are imported in the backend.
-- `tests/test_security_boundaries.py` enforces these invariants in CI.
+- All filesystem reads go through whitelisted resolvers
+  (`resolve_sample_log`, `resolve_dataset`).
+- No `subprocess`, `os.system`, or external HTTP libraries.
+- `tests/test_security_boundaries.py` and `tests/test_datasets.py`
+  enforce these invariants and the RFC 5737 / RFC 1918 IP policy.
 
 See [docs/threat_model.md](docs/threat_model.md) and
 [reports/SECURITY_REPORT.md](reports/SECURITY_REPORT.md).
@@ -183,11 +192,10 @@ repository commits and project decisions were managed by the author.
 
 - Mock AI summarizer only — no real LLM call.
 - No persistent storage; analyses run in-memory per request.
-- Sample logs are illustrative; production deployments need real ingestion.
-- Detection rules are intentionally simple and meant for portfolio review.
+- Sample logs and datasets are synthetic; production deployments need real ingestion.
+- Detection rules and playbooks are educational and intentionally simple.
 
 ## Portfolio Usage
 
 See [docs/portfolio_summary.md](docs/portfolio_summary.md) and
-[docs/demo_walkthrough.md](docs/demo_walkthrough.md) for screenshot-friendly
-review paths.
+[docs/demo_walkthrough.md](docs/demo_walkthrough.md).

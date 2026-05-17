@@ -71,3 +71,28 @@ reconnaissance -> initial_access -> execution -> persistence ->
 privilege_escalation -> credential_access -> discovery ->
 lateral_movement -> command_and_control -> exfiltration -> impact
 ```
+
+## v3 detection engineering pipeline
+
+```
+rules.json
+   │
+   ├── rule_quality_score   ──┐
+   ├── explain_rule          ─┤
+   ├── validate_rule_schema  ─┼─→ build_detection_engineering_report
+   └── coverage matrix       ─┘
+   │
+   ├── evaluation scenarios ──┐
+   └── per-dataset analysis ──┤
+                              v
+              metrics: precision / recall / F1
+```
+
+## v3 workflow state machine
+
+```
+new ──→ triaged ──→ investigating ──→ contained ──→ resolved
+ │         │              │
+ │         ├──→ resolved  ├──→ resolved
+ └────→ false_positive    └──→ false_positive
+```

@@ -33,6 +33,19 @@ returns structured findings.
 | T07 | Accidental secret commit | `.gitignore` excludes `.env`, secret scan in security tests. |
 | T08 | Sample logs leaking real data | All IPs are RFC 5737; domains are clearly synthetic (`.example`). |
 
+## v3 surface additions
+
+- `/datasets/{dataset_id}` is gated by `resolve_dataset`, which
+  whitelists the six known dataset IDs and refuses any `..`/`/`/`\`.
+- `/playbooks/recommend`, `/workflow/simulate`,
+  `/datasets/analyze/{id}` reuse the parsing + detection pipeline
+  and do not add any new file or network I/O paths.
+- All playbook actions are static text; the platform never executes
+  anything.
+- `/report/executive`, `/report/analyst`, and
+  `/report/detection-engineering` are pure rendering of the same
+  in-memory analysis data.
+
 ## v2 surface additions
 
 The v2 endpoints (`/triage`, `/cases`, `/false-positive`, `/rules/tuning`,

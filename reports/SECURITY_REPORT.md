@@ -37,6 +37,9 @@ internet, no persistent storage, and no remote calls. The primary risks are:
 | S4 | Regex DoS surface (catastrophic backtracking) | low | rules use bounded patterns; mitigations recommended for production |
 | S5 | v2 endpoints accept analyst-supplied raw logs | informational | confined to parsing + detection; no eval, no shell |
 | S6 | SOC report includes recommended actions | informational | actions are static templates; never executed |
+| S7 | v3 datasets are loaded from disk | informational | dataset IDs are whitelisted via `resolve_dataset` |
+| S8 | v3 playbooks document containment steps | informational | playbooks are static text; no automation runs |
+| S9 | v3 workflow simulator transitions case state in memory | informational | no persistence, no external action |
 
 ## AI-assisted disclosure
 

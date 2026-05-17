@@ -1,0 +1,66 @@
+{
+  "version": "1.0",
+  "description": "Synthetic Attack Dataset v3 manifest. All data is local, fake, and uses RFC 5737 / RFC 1918 IP space only.",
+  "datasets": [
+    {
+      "id": "benign_baseline",
+      "filename": "benign_baseline.log",
+      "log_type": "auth",
+      "description": "Normal successful SSH logins for baseline behavior. Expected to produce no high/critical findings.",
+      "expected_findings": [],
+      "expected_mitre": [],
+      "expected_severity": "informational",
+      "contains_real_data": false
+    },
+    {
+      "id": "brute_force_campaign",
+      "filename": "brute_force_campaign.log",
+      "log_type": "auth",
+      "description": "Sustained SSH brute force from a single source IP cycling through invalid usernames.",
+      "expected_findings": ["R001", "R002"],
+      "expected_mitre": ["T1110", "T1087"],
+      "expected_severity": "high",
+      "contains_real_data": false
+    },
+    {
+      "id": "web_attack_campaign",
+      "filename": "web_attack_campaign.log",
+      "log_type": "web",
+      "description": "Synthetic web attack sequence including scanning, SQL injection, XSS, traversal, and command injection probes.",
+      "expected_findings": ["R004", "R005", "R006", "R007", "R008", "R009", "R019"],
+      "expected_mitre": ["T1190", "T1059", "T1595"],
+      "expected_severity": "high",
+      "contains_real_data": false
+    },
+    {
+      "id": "dns_beacon_campaign",
+      "filename": "dns_beacon_campaign.log",
+      "log_type": "dns",
+      "description": "Periodic DNS beacon to a fake C2 domain plus DGA-style subdomains and NXDOMAIN burst.",
+      "expected_findings": ["R013", "R014", "R015"],
+      "expected_mitre": ["T1071", "T1105"],
+      "expected_severity": "high",
+      "contains_real_data": false
+    },
+    {
+      "id": "multi_stage_intrusion",
+      "filename": "multi_stage_intrusion.log",
+      "log_type": "mixed",
+      "description": "Multi-stage intrusion: port scan + admin probe + SQLi + traversal + brute force + sudo on /etc/shadow + DNS beacon.",
+      "expected_findings": ["R001", "R002", "R003", "R004", "R006", "R007", "R008", "R010", "R011", "R015", "R018"],
+      "expected_mitre": ["T1110", "T1190", "T1003", "T1046", "T1071", "T1059", "T1595"],
+      "expected_severity": "critical",
+      "contains_real_data": false
+    },
+    {
+      "id": "noisy_false_positive",
+      "filename": "noisy_false_positive.log",
+      "log_type": "web",
+      "description": "Activity that may resemble attacks but is benign: search-engine crawlers, missing page 404s, legitimate admin user. Expected to produce medium/high false-positive likelihood alerts.",
+      "expected_findings": [],
+      "expected_mitre": [],
+      "expected_severity": "low",
+      "contains_real_data": false
+    }
+  ]
+}

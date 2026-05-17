@@ -1,0 +1,12 @@
+2026-06-02T08:00:01Z sshd[4001]: Failed password for invalid user admin from 198.51.100.40 port 60001 ssh2
+2026-06-02T08:00:02Z sshd[4002]: Failed password for invalid user admin from 198.51.100.40 port 60002 ssh2
+2026-06-02T08:00:03Z sshd[4003]: Failed password for invalid user admin from 198.51.100.40 port 60003 ssh2
+2026-06-02T08:00:04Z sshd[4004]: Failed password for invalid user admin from 198.51.100.40 port 60004 ssh2
+2026-06-02T08:00:05Z sshd[4005]: Failed password for invalid user admin from 198.51.100.40 port 60005 ssh2
+2026-06-02T08:00:06Z sshd[4006]: Failed password for invalid user root from 198.51.100.40 port 60006 ssh2
+2026-06-02T08:00:07Z sshd[4007]: Failed password for invalid user root from 198.51.100.40 port 60007 ssh2
+2026-06-02T08:00:08Z sshd[4008]: Failed password for invalid user oracle from 198.51.100.40 port 60008 ssh2
+2026-06-02T08:00:09Z sshd[4009]: Failed password for invalid user postgres from 198.51.100.40 port 60009 ssh2
+2026-06-02T08:00:10Z sshd[4010]: Failed password for invalid user backup from 198.51.100.40 port 60010 ssh2
+2026-06-02T08:00:11Z sshd[4011]: Failed password for invalid user guest from 198.51.100.40 port 60011 ssh2
+2026-06-02T08:00:12Z sshd[4012]: Failed password for invalid user test from 198.51.100.40 port 60012 ssh2

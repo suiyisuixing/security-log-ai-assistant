@@ -28,6 +28,10 @@ npm run build
 - v2: SOC Overview, Alert Triage Queue, Incident Cases, Entity Risk
   Profiles, Kill Chain View, MITRE Coverage Matrix, Rule Tuning, SOC
   Report (JSON + Markdown with Copy buttons).
+- v3: Detection Metrics (precision/recall/F1), Rule Quality table,
+  Dataset Evaluation dashboard, Playbook Recommendations, Analyst
+  Workflow Simulation, Report Center v3 (Executive / Analyst /
+  Detection Engineering with Copy report).
 
 ## Notes
 

@@ -45,6 +45,10 @@
 | `entities.py` | (v2) Entity risk profiles for IP/user/domain/path |
 | `kill_chain.py` | (v2) Kill-chain stage mapping from MITRE tactics |
 | `coverage.py` | (v2) MITRE coverage matrix + summary |
+| `detection_engineering.py` | (v3) Rule quality scoring, explanation, gap analysis, DE report |
+| `metrics.py` | (v3) Precision/recall/F1 across scenarios |
+| `workflow.py` | (v3) Analyst workflow state machine + simulator |
+| `playbooks.py` | (v3) Playbook library loader + recommender |
 | `main.py` | FastAPI app, endpoint declarations, CORS, exception mapping |
 
 ## Data flow

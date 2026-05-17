@@ -570,6 +570,217 @@ function SocReportPanel({ sourceType, raw }) {
   )
 }
 
+function DetectionMetricsPanel() {
+  const [data, setData] = useState(null)
+  return (
+    <div className="card">
+      <h2>Detection Metrics</h2>
+      <button onClick={async () => setData(await api.metricsEvaluation())}>Load Evaluation Metrics</button>
+      {data && (
+        <>
+          <div className="grid-4">
+            <div className="metric"><div className="label">Precision</div><div className="value">{data.metrics.precision.toFixed(3)}</div></div>
+            <div className="metric"><div className="label">Recall</div><div className="value">{data.metrics.recall.toFixed(3)}</div></div>
+            <div className="metric"><div className="label">F1 score</div><div className="value">{data.metrics.f1_score.toFixed(3)}</div></div>
+            <div className="metric"><div className="label">TP / FP / FN</div><div className="value" style={{ fontSize: 14 }}>{data.metrics.true_positives} / {data.metrics.false_positives} / {data.metrics.false_negatives}</div></div>
+          </div>
+          <div className="muted" style={{ marginTop: 6 }}>{data.summary}</div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function RuleQualityPanel() {
+  const [data, setData] = useState(null)
+  return (
+    <div className="card">
+      <h2>Rule Quality (Detection Engineering)</h2>
+      <button onClick={async () => setData(await api.detectionEngineeringReport())}>Load Detection Engineering Report</button>
+      {data && (
+        <>
+          <div className="muted" style={{ marginTop: 6 }}>
+            Rules: {data.rule_count} | Avg score: {data.average_quality_score} | Distribution: {JSON.stringify(data.quality_distribution)}
+          </div>
+          <table>
+            <thead><tr><th>Rule</th><th>Score</th><th>Level</th><th>Strengths</th><th>Weaknesses</th><th>Suggestions</th></tr></thead>
+            <tbody>
+              {data.rule_quality.map((q) => (
+                <tr key={q.rule_id}>
+                  <td>{q.rule_id}</td>
+                  <td>{q.quality_score}</td>
+                  <td><span className="pill">{q.quality_level}</span></td>
+                  <td style={{ fontSize: 11 }}>{q.strengths.join('; ')}</td>
+                  <td style={{ fontSize: 11 }}>{q.weaknesses.join('; ') || '-'}</td>
+                  <td style={{ fontSize: 11 }}>{q.improvement_suggestions.join('; ') || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </div>
+  )
+}
+
+function DatasetEvaluationPanel() {
+  const [list, setList] = useState(null)
+  const [selected, setSelected] = useState('')
+  const [analysis, setAnalysis] = useState(null)
+  return (
+    <div className="card">
+      <h2>Dataset Evaluation</h2>
+      <button onClick={async () => setList(await api.datasets())}>Load Datasets</button>
+      {list && (
+        <>
+          <select value={selected} onChange={(e) => setSelected(e.target.value)} style={{ marginTop: 8, maxWidth: 320 }}>
+            <option value="">-- choose dataset --</option>
+            {list.datasets.map((d) => <option key={d.id} value={d.id}>{d.id}</option>)}
+          </select>
+          <button onClick={async () => { if (selected) setAnalysis(await api.datasetAnalyze(selected)) }} disabled={!selected}>Analyze Selected Dataset</button>
+          <table>
+            <thead><tr><th>ID</th><th>Log type</th><th>Expected severity</th><th>Expected MITRE</th><th>Synthetic</th></tr></thead>
+            <tbody>
+              {list.datasets.map((d) => (
+                <tr key={d.id}>
+                  <td>{d.id}</td>
+                  <td>{d.log_type}</td>
+                  <td><Badge value={d.expected_severity} /></td>
+                  <td>{d.expected_mitre.map((m) => <span key={m} className="pill">{m}</span>)}</td>
+                  <td>{d.contains_real_data ? <span className="badge failed">real</span> : <span className="badge passed">synthetic</span>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {analysis && (
+            <>
+              <h3>Analysis: {analysis.dataset_id}</h3>
+              <div className="muted">
+                events={analysis.event_count} | findings={analysis.finding_count} |
+                score={analysis.overall_score} ({analysis.overall_severity}) |
+                expected={analysis.expected_severity} |
+                missing_rules={analysis.missing_rule_ids.join(',') || 'none'} |
+                unexpected_rules={analysis.unexpected_rule_ids.join(',') || 'none'}
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+function PlaybookPanel({ sourceType, raw }) {
+  const [list, setList] = useState(null)
+  const [recs, setRecs] = useState(null)
+  return (
+    <div className="card">
+      <h2>Playbook Recommendations</h2>
+      <button onClick={async () => setList(await api.playbooks())}>Load Playbooks</button>
+      <button className="secondary" onClick={async () => setRecs(await api.playbooksRecommend(sourceType, raw))}>Recommend Playbooks</button>
+      {recs && (
+        <>
+          <h3>Recommended</h3>
+          <div className="muted">Total: {recs.summary.total_recommended}</div>
+          <table>
+            <thead><tr><th>ID</th><th>Title</th><th>Severity</th><th>Steps</th><th>Containment</th></tr></thead>
+            <tbody>
+              {recs.recommendations.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.title}</td>
+                  <td><Badge value={p.severity} /></td>
+                  <td><ul style={{ margin: 0, paddingLeft: 16, fontSize: 11 }}>{p.steps.map((s, i) => <li key={i}>{s}</li>)}</ul></td>
+                  <td><ul style={{ margin: 0, paddingLeft: 16, fontSize: 11 }}>{p.containment.map((s, i) => <li key={i}>{s}</li>)}</ul></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+      {list && !recs && (
+        <table>
+          <thead><tr><th>ID</th><th>Title</th><th>Severity</th><th>MITRE</th></tr></thead>
+          <tbody>
+            {list.playbooks.map((p) => (
+              <tr key={p.id}>
+                <td>{p.id}</td>
+                <td>{p.title}</td>
+                <td><Badge value={p.severity} /></td>
+                <td>{p.mapped_mitre.map((m) => <span key={m} className="pill">{m}</span>)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  )
+}
+
+function WorkflowPanel() {
+  const [data, setData] = useState(null)
+  return (
+    <div className="card">
+      <h2>Analyst Workflow Simulation</h2>
+      <button onClick={async () => setData(await api.workflowSample())}>Build Workflow</button>
+      {data && (
+        <>
+          <div className="muted" style={{ marginTop: 6 }}>
+            total={data.summary.total_cases} | triaged={data.summary.triaged} | investigating={data.summary.investigating} | contained={data.summary.contained} | resolved={data.summary.resolved} | false_positive={data.summary.false_positive}
+          </div>
+          <h3>Steps</h3>
+          <table>
+            <thead><tr><th>Case</th><th>From</th><th>To</th><th>Reason</th></tr></thead>
+            <tbody>
+              {data.steps.map((s, i) => (
+                <tr key={i}>
+                  <td>{s.case_id}</td>
+                  <td>{s.from_status || '(new)'}</td>
+                  <td><span className="pill">{s.to_status}</span></td>
+                  <td style={{ fontSize: 11 }}>{s.reason}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </div>
+  )
+}
+
+function ReportCenterV3({ sourceType, raw }) {
+  const [active, setActive] = useState('')
+  const [content, setContent] = useState('')
+  const copy = (txt) => { try { navigator.clipboard.writeText(txt) } catch (e) {} }
+  const load = async (which) => {
+    setActive(which)
+    if (which === 'executive') {
+      const r = await api.reportExecutive(sourceType, raw)
+      setContent(r.markdown)
+    } else if (which === 'analyst') {
+      const r = await api.reportAnalyst(sourceType, raw)
+      setContent(r.markdown)
+    } else if (which === 'de') {
+      const r = await api.reportDetectionEngineering()
+      setContent(r.markdown)
+    }
+  }
+  return (
+    <div className="card">
+      <h2>Report Center v3</h2>
+      <button onClick={() => load('executive')}>Executive Report</button>
+      <button className="secondary" onClick={() => load('analyst')}>Analyst Report</button>
+      <button className="secondary" onClick={() => load('de')}>Detection Engineering Report</button>
+      {content && (
+        <>
+          <h3>{active} report <button onClick={() => copy(content)}>Copy report</button></h3>
+          <pre>{content}</pre>
+        </>
+      )}
+    </div>
+  )
+}
+
 export default function App() {
   const [samples, setSamples] = useState([])
   const [selectedSample, setSelectedSample] = useState('')
@@ -601,8 +812,8 @@ export default function App() {
   return (
     <div className="container">
       <div className="header">
-        <h1>Security Log AI Assistant — SOC Platform</h1>
-        <span className="muted">v2.0-rc</span>
+        <h1>Security Log AI Assistant — Detection Engineering &amp; SOC Workflow Platform</h1>
+        <span className="muted">v3.0-rc</span>
       </div>
       <BackendStatusCard />
       <DisclosureCard />
@@ -626,6 +837,12 @@ export default function App() {
       <RuleTuningPanel />
       <ReportsPanel sourceType={sourceType} raw={raw} />
       <SocReportPanel sourceType={sourceType} raw={raw} />
+      <DetectionMetricsPanel />
+      <RuleQualityPanel />
+      <DatasetEvaluationPanel />
+      <PlaybookPanel sourceType={sourceType} raw={raw} />
+      <WorkflowPanel />
+      <ReportCenterV3 sourceType={sourceType} raw={raw} />
       <EvaluationPanel />
       <DashboardSummaryPanel />
     </div>

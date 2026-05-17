@@ -24,6 +24,19 @@
 - 9 new pytest files (82 new tests) bringing the suite to 195 total.
 - Eight new frontend panels with no new dependencies.
 
+## v3 additions
+
+- A detection engineering layer: per-rule quality scoring, plain-English
+  explanations, schema validation, gap analysis, and improvement plans.
+- Precision, recall, and F1 metrics over named evaluation scenarios.
+- Six synthetic attack datasets with explicit expected findings.
+- A deterministic analyst workflow simulator with six states.
+- An eight-playbook educational response library and a recommender.
+- Three audience-specific Markdown reports (Executive / Analyst /
+  Detection Engineering).
+- 7 additional test files (89 new tests) bringing the suite to 284 total.
+- 6 additional frontend panels, still zero new dependencies.
+
 ## Skills shown
 
 - Designing and documenting an API surface.

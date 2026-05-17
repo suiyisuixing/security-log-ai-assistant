@@ -32,7 +32,22 @@ Base URL during development: `http://127.0.0.1:8000`
 | GET    | `/coverage/mitre` | - | MITRE coverage matrix + summary |
 | POST   | `/report/soc-json` | `{source_type, raw_logs}` | full SOC report (JSON) |
 | POST   | `/report/soc-markdown` | `{source_type, raw_logs}` | full SOC report (Markdown) |
-| GET    | `/api/surface` | - | this endpoint inventory |
+| GET    | `/datasets` | - | list synthetic datasets |
+| GET    | `/datasets/{dataset_id}` | - | dataset metadata + content |
+| POST   | `/datasets/analyze/{dataset_id}` | - | parse + detect + score |
+| GET    | `/detection-engineering/rules` | - | per-rule quality + explanation |
+| GET    | `/detection-engineering/report` | - | full detection-engineering report (JSON) |
+| GET    | `/detection-engineering/metrics` | - | quality + coverage + evaluation summary |
+| GET    | `/metrics/evaluation` | - | precision / recall / F1 |
+| GET    | `/metrics/rules` | - | per-rule metrics |
+| GET    | `/playbooks` | - | playbook library |
+| POST   | `/playbooks/recommend` | `{log_type, raw_logs}` | recommended playbooks |
+| GET    | `/workflow/sample` | - | analyst workflow over all sample logs |
+| POST   | `/workflow/simulate` | `{log_type, raw_logs}` | workflow over analyst input |
+| POST   | `/report/executive` | `{source_type, raw_logs}` | executive report (Markdown) |
+| POST   | `/report/analyst` | `{source_type, raw_logs}` | analyst report (Markdown) |
+| POST   | `/report/detection-engineering` | - | DE report (Markdown) |
+| GET    | `/api/surface` | - | this endpoint inventory (44 endpoints) |
 
 ## Errors
 

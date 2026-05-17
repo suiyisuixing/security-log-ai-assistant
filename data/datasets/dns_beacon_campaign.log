@@ -1,0 +1,15 @@
+2026-06-04T10:00:00Z dns client=10.0.0.50 query=beacon.evil-c2.example type=A response=NOERROR
+2026-06-04T10:00:30Z dns client=10.0.0.50 query=beacon.evil-c2.example type=A response=NOERROR
+2026-06-04T10:01:00Z dns client=10.0.0.50 query=beacon.evil-c2.example type=A response=NOERROR
+2026-06-04T10:01:30Z dns client=10.0.0.50 query=beacon.evil-c2.example type=A response=NOERROR
+2026-06-04T10:02:00Z dns client=10.0.0.50 query=beacon.evil-c2.example type=A response=NOERROR
+2026-06-04T10:02:30Z dns client=10.0.0.50 query=beacon.evil-c2.example type=A response=NOERROR
+2026-06-04T10:03:00Z dns client=10.0.0.50 query=xkjqwzpvbnmlkjhgfd.suspicious-domain.top type=A response=NOERROR
+2026-06-04T10:03:10Z dns client=10.0.0.50 query=qpwoeiruty1029384756.suspicious-domain.top type=A response=NOERROR
+2026-06-04T10:03:20Z dns client=10.0.0.50 query=zxcvbnmasdfghjkl9876.suspicious-domain.top type=A response=NOERROR
+2026-06-04T10:03:30Z dns client=10.0.0.50 query=nonexistent1.example type=A response=NXDOMAIN
+2026-06-04T10:03:31Z dns client=10.0.0.50 query=nonexistent2.example type=A response=NXDOMAIN
+2026-06-04T10:03:32Z dns client=10.0.0.50 query=nonexistent3.example type=A response=NXDOMAIN
+2026-06-04T10:03:33Z dns client=10.0.0.50 query=nonexistent4.example type=A response=NXDOMAIN
+2026-06-04T10:03:34Z dns client=10.0.0.50 query=nonexistent5.example type=A response=NXDOMAIN
+2026-06-04T10:03:35Z dns client=10.0.0.50 query=nonexistent6.example type=A response=NXDOMAIN

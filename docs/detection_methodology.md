@@ -55,6 +55,15 @@ otherwise    -> informational
 
 `overall = round(0.7 * max(finding_scores) + 0.3 * mean(finding_scores))`
 
+## v3 additions
+
+- Each rule receives a quality score with strengths/weaknesses (see
+  `docs/detection_engineering.md`).
+- Evaluation is summarized as precision, recall, and F1 over all
+  scenarios; per-rule and per-category breakdowns are available.
+- Six synthetic datasets in `data/datasets/` declare their expected
+  findings, MITRE techniques, and severity for self-evaluation.
+
 ## v2 additions
 
 - Each finding is converted into an `Alert` with a P1-P4 priority.

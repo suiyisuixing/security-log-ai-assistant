@@ -309,3 +309,264 @@ def build_soc_markdown_report(soc_report: Dict[str, Any]) -> str:
 
     lines.append(f"_{soc_report['ai_disclosure']}_")
     return "\n".join(lines)
+
+
+# --- v3 reports ---
+
+
+def build_executive_report(events: List[ParsedEvent], findings: List[Finding]) -> str:
+    """Executive-style Markdown report. Business-tone, less technical detail."""
+    from .playbooks import recommend_playbooks
+
+    soc = build_soc_report(events, findings)
+    top_cases = [c for c in soc["cases"] if c["severity"] in ("critical", "high")]
+    high_entities = [e for e in soc["entities"] if e["severity"] in ("critical", "high")]
+    playbook_recs = recommend_playbooks(findings)
+
+    lines: List[str] = []
+    lines.append("# Executive Security Report")
+    lines.append("")
+    lines.append(f"- Generated: {soc['generated_at']}")
+    lines.append(f"- Overall risk: {soc['overall_score']}/100 ({soc['overall_severity']})")
+    lines.append(f"- Events analyzed: {soc['total_events']}")
+    lines.append("")
+    lines.append("## Executive Summary")
+    lines.append("")
+    lines.append(soc["executive_summary"])
+    lines.append("")
+    lines.append("## Top Risks")
+    lines.append("")
+    if top_cases:
+        for c in top_cases:
+            lines.append(
+                f"- {c['title']} (case {c['case_id']}, severity {c['severity']})"
+            )
+    else:
+        lines.append("- No high or critical cases at this time.")
+    lines.append("")
+    lines.append("## Business Impact")
+    lines.append("")
+    if high_entities:
+        lines.append(
+            f"- {len(high_entities)} entity(ies) flagged as high or critical risk."
+        )
+        lines.append(
+            f"- Highest risk score observed: {high_entities[0]['risk_score']}."
+        )
+    else:
+        lines.append("- No high-risk entities observed in this window.")
+    lines.append(
+        f"- Detection coverage of MITRE ATT&CK: {soc['coverage_summary']['coverage_rate']:.0%}."
+    )
+    lines.append("")
+    lines.append("## High-Priority Cases")
+    lines.append("")
+    if top_cases:
+        for c in top_cases:
+            lines.append(
+                f"- {c['case_id']}: {c['title']} -> priority {c['priority']}, "
+                f"{len(c['related_alert_ids'])} alert(s)."
+            )
+    else:
+        lines.append("- None.")
+    lines.append("")
+    lines.append("## Recommended Executive Actions")
+    lines.append("")
+    if playbook_recs:
+        for pb in playbook_recs:
+            lines.append(f"- Approve and resource playbook: {pb['title']}.")
+    if soc["recommendations"]:
+        for r in soc["recommendations"][:5]:
+            lines.append(f"- {r}")
+    if not playbook_recs and not soc["recommendations"]:
+        lines.append("- Continue monitoring; no immediate action required.")
+    lines.append("")
+    lines.append("## Limitations")
+    lines.append("")
+    for lim in soc["limitations"]:
+        lines.append(f"- {lim}")
+    lines.append(
+        "- This is a local educational report based on synthetic data."
+    )
+    lines.append("")
+    lines.append(f"_{soc['ai_disclosure']}_")
+    return "\n".join(lines)
+
+
+def build_analyst_report(events: List[ParsedEvent], findings: List[Finding]) -> str:
+    """SOC-analyst-focused Markdown report."""
+    from .playbooks import recommend_playbooks
+
+    soc = build_soc_report(events, findings)
+    playbook_recs = recommend_playbooks(findings)
+
+    lines: List[str] = []
+    lines.append("# SOC Analyst Investigation Report")
+    lines.append("")
+    lines.append(f"- Generated: {soc['generated_at']}")
+    lines.append(
+        f"- Overall risk: {soc['overall_score']}/100 ({soc['overall_severity']})"
+    )
+    lines.append("")
+    lines.append("## Findings")
+    lines.append("")
+    for f in soc["findings"]:
+        lines.append(
+            f"- [{f['severity'].upper()}] {f['rule_id']} {f['rule_name']} "
+            f"(events={len(f['matched_events'])}, score={f['score']})"
+        )
+    lines.append("")
+    lines.append("## Evidence")
+    lines.append("")
+    for f in soc["findings"][:8]:
+        for ev in f["matched_events"][:3]:
+            lines.append(f"- `{ev['raw']}`")
+    lines.append("")
+    lines.append("## Timeline")
+    lines.append("")
+    for t in soc["timeline"][:30]:
+        lines.append(
+            f"- {t['timestamp']} | [{t['severity']}] {t['rule_id']} {t['summary']}"
+        )
+    lines.append("")
+    lines.append("## Cases")
+    lines.append("")
+    for c in soc["cases"]:
+        lines.append(
+            f"- {c['case_id']} {c['title']} (sev {c['severity']}, "
+            f"{len(c['related_alert_ids'])} alerts)"
+        )
+    lines.append("")
+    lines.append("## Entities")
+    lines.append("")
+    for e in soc["entities"][:10]:
+        lines.append(
+            f"- {e['entity_type']}:{e['entity_id']} score={e['risk_score']} "
+            f"sev={e['severity']}"
+        )
+    lines.append("")
+    lines.append("## MITRE ATT&CK")
+    lines.append("")
+    for e in soc["coverage_matrix"]:
+        if e["covered"]:
+            lines.append(
+                f"- {e['technique_id']} {e['technique_name']} via "
+                f"{', '.join(e['rule_ids'])}"
+            )
+    lines.append("")
+    lines.append("## Playbooks")
+    lines.append("")
+    if playbook_recs:
+        for pb in playbook_recs:
+            lines.append(
+                f"- {pb['id']} {pb['title']} (sev {pb['severity']})"
+            )
+    else:
+        lines.append("- No playbooks matched.")
+    lines.append("")
+    lines.append("## Triage Steps")
+    lines.append("")
+    for r in soc["recommendations"]:
+        lines.append(f"- {r}")
+    lines.append("")
+    lines.append("_Local educational report; no external services contacted._")
+    return "\n".join(lines)
+
+
+def build_detection_engineering_report_markdown(report: Dict) -> str:
+    """Detection-engineer-focused Markdown rendering."""
+    lines: List[str] = []
+    lines.append("# Detection Engineering Report")
+    lines.append("")
+    lines.append(f"- Generated: {report['generated_at']}")
+    lines.append(f"- Rules: {report['rule_count']}")
+    lines.append(
+        f"- Average quality score: {report['average_quality_score']}"
+    )
+    lines.append(
+        f"- Quality distribution: {report['quality_distribution']}"
+    )
+    lines.append("")
+    lines.append("## Rule Quality")
+    lines.append("")
+    for q in report["rule_quality"]:
+        lines.append(
+            f"### {q['rule_id']} - {q['quality_level']} ({q['quality_score']}/100)"
+        )
+        if q["strengths"]:
+            lines.append("- Strengths:")
+            for s in q["strengths"]:
+                lines.append(f"  - {s}")
+        if q["weaknesses"]:
+            lines.append("- Weaknesses:")
+            for w in q["weaknesses"]:
+                lines.append(f"  - {w}")
+        if q["improvement_suggestions"]:
+            lines.append("- Suggestions:")
+            for s in q["improvement_suggestions"]:
+                lines.append(f"  - {s}")
+        lines.append("")
+    lines.append("## Detection Coverage")
+    lines.append("")
+    cs = report["coverage_summary"]
+    lines.append(
+        f"- Coverage rate: {cs['coverage_rate']:.0%} "
+        f"({cs['covered']}/{cs['total_techniques']})"
+    )
+    lines.append("")
+    lines.append("## Evaluation Metrics")
+    lines.append("")
+    m = report["evaluation_metrics"]
+    lines.append(
+        f"- TP={m['true_positives']}, FP={m['false_positives']}, "
+        f"FN={m['false_negatives']}"
+    )
+    lines.append(
+        f"- Precision={m['precision']:.3f}, recall={m['recall']:.3f}, "
+        f"F1={m['f1_score']:.3f}"
+    )
+    lines.append("")
+    lines.append("## False Positive Notes")
+    lines.append("")
+    for rm in report["rule_metrics"]:
+        if rm["false_positives"] > 0:
+            lines.append(
+                f"- {rm['rule_id']} has {rm['false_positives']} FP(s) across scenarios."
+            )
+    if not any(rm["false_positives"] for rm in report["rule_metrics"]):
+        lines.append("- No false positives observed across evaluation scenarios.")
+    lines.append("")
+    lines.append("## Rule Tuning Suggestions")
+    lines.append("")
+    for rec in report["tuning_recommendations"]:
+        lines.append(
+            f"- {rec['rule_id']} [{rec['recommendation_type']}]: "
+            f"{rec['suggested_change']}"
+        )
+    if not report["tuning_recommendations"]:
+        lines.append("- No tuning recommendations at this time.")
+    lines.append("")
+    lines.append("## Detection Gaps")
+    lines.append("")
+    gaps = report["coverage_gaps"]
+    if gaps["uncovered_techniques"]:
+        lines.append(
+            f"- Uncovered MITRE techniques: {', '.join(gaps['uncovered_techniques'])}"
+        )
+    if gaps["weakly_covered_techniques"]:
+        lines.append(
+            f"- Weakly covered MITRE techniques: {', '.join(gaps['weakly_covered_techniques'])}"
+        )
+    for sg in gaps["scenario_gaps"]:
+        lines.append(
+            f"- Scenario {sg['scenario_id']} missing rules: {', '.join(sg['missing_rule_ids'])}"
+        )
+    if (
+        not gaps["uncovered_techniques"]
+        and not gaps["weakly_covered_techniques"]
+        and not gaps["scenario_gaps"]
+    ):
+        lines.append("- No coverage or scenario gaps detected.")
+    lines.append("")
+    lines.append(f"_{report['ai_disclosure']}_")
+    return "\n".join(lines)

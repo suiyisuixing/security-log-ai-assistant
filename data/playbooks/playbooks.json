@@ -1,0 +1,188 @@
+{
+  "version": "1.0",
+  "description": "Local educational SOC response playbooks. Synthetic data only; no real incident response is performed.",
+  "playbooks": [
+    {
+      "id": "PB_BRUTE_FORCE",
+      "title": "SSH Brute Force Response",
+      "mapped_rules": ["R001", "R002"],
+      "mapped_mitre": ["T1110", "T1087"],
+      "severity": "high",
+      "steps": [
+        "Confirm whether the source IP is expected.",
+        "Check account lockout and MFA status for the targeted users.",
+        "Review whether any successful login followed the failed attempts.",
+        "Temporarily block the source IP if activity is unauthorized."
+      ],
+      "containment": [
+        "Block the source IP at the perimeter firewall.",
+        "Force password reset for any targeted accounts with weak passwords."
+      ],
+      "evidence_to_collect": [
+        "Authentication logs (sshd) for the relevant window.",
+        "Successful login records for the targeted accounts.",
+        "Source IP reputation data from internal threat-intel notes."
+      ],
+      "limitations": "This is a local educational playbook using fake data."
+    },
+    {
+      "id": "PB_WEB_ATTACK",
+      "title": "Web Application Attack Response",
+      "mapped_rules": ["R007", "R008", "R016", "R020"],
+      "mapped_mitre": ["T1190", "T1595"],
+      "severity": "high",
+      "steps": [
+        "Identify the targeted endpoints and HTTP methods.",
+        "Correlate alerts by source IP and user-agent.",
+        "Confirm whether the application returned sensitive data.",
+        "Engage application owners for impact assessment."
+      ],
+      "containment": [
+        "Apply WAF signatures for the observed payloads.",
+        "Rate-limit or block the source IP at the edge.",
+        "Disable the targeted endpoint if it is unintentionally exposed."
+      ],
+      "evidence_to_collect": [
+        "Web access logs for the entire campaign window.",
+        "Application server error logs.",
+        "WAF telemetry and any DB-side audit logs."
+      ],
+      "limitations": "This is a local educational playbook using fake data."
+    },
+    {
+      "id": "PB_SQL_INJECTION",
+      "title": "SQL Injection Response",
+      "mapped_rules": ["R004"],
+      "mapped_mitre": ["T1190"],
+      "severity": "high",
+      "steps": [
+        "Verify the injection payload reached the database.",
+        "Check for data extraction in DB-side query logs.",
+        "Identify the application code path that allowed the injection."
+      ],
+      "containment": [
+        "Apply WAF signatures or input validation.",
+        "Virtual-patch the vulnerable endpoint.",
+        "Rotate any credentials that may have been exposed."
+      ],
+      "evidence_to_collect": [
+        "Full web request bodies for the campaign.",
+        "Database query logs.",
+        "Application stack traces."
+      ],
+      "limitations": "This is a local educational playbook using fake data."
+    },
+    {
+      "id": "PB_XSS",
+      "title": "Cross-Site Scripting Response",
+      "mapped_rules": ["R005"],
+      "mapped_mitre": ["T1190"],
+      "severity": "high",
+      "steps": [
+        "Identify the injected payload and the reflection point.",
+        "Check whether the payload is stored, reflected, or DOM-based.",
+        "Identify affected users (cookies, session state)."
+      ],
+      "containment": [
+        "Apply output-encoding fix on the vulnerable endpoint.",
+        "Invalidate affected user sessions.",
+        "Add CSP header to limit script execution."
+      ],
+      "evidence_to_collect": [
+        "Request and response bodies for the affected endpoint.",
+        "Session activity for any user that loaded the injected page."
+      ],
+      "limitations": "This is a local educational playbook using fake data."
+    },
+    {
+      "id": "PB_DIRECTORY_TRAVERSAL",
+      "title": "Directory Traversal Response",
+      "mapped_rules": ["R006", "R009"],
+      "mapped_mitre": ["T1190"],
+      "severity": "high",
+      "steps": [
+        "Confirm whether sensitive files were served.",
+        "Identify the vulnerable file-serving code path.",
+        "Determine whether file integrity has changed."
+      ],
+      "containment": [
+        "Apply path canonicalization in the application.",
+        "Restrict the application user's filesystem access.",
+        "Block the source IP at the edge if necessary."
+      ],
+      "evidence_to_collect": [
+        "Web access logs for the traversal window.",
+        "Application server file-access audit logs."
+      ],
+      "limitations": "This is a local educational playbook using fake data."
+    },
+    {
+      "id": "PB_DNS_BEACON",
+      "title": "DNS Beacon / C2 Response",
+      "mapped_rules": ["R013", "R014", "R015"],
+      "mapped_mitre": ["T1071", "T1105"],
+      "severity": "high",
+      "steps": [
+        "Identify the originating host and any peers.",
+        "Determine the cadence and stability of the beacon.",
+        "Inspect the suspect host for known persistence mechanisms."
+      ],
+      "containment": [
+        "Sinkhole the suspicious domain(s).",
+        "Isolate the originating host from the network.",
+        "Block outbound DNS to non-corporate resolvers."
+      ],
+      "evidence_to_collect": [
+        "Full DNS query history for the affected host.",
+        "Endpoint process telemetry for the same window.",
+        "Any associated outbound HTTP/HTTPS connection logs."
+      ],
+      "limitations": "This is a local educational playbook using fake data."
+    },
+    {
+      "id": "PB_PORT_SCAN",
+      "title": "Port Scan / Network Recon Response",
+      "mapped_rules": ["R010", "R011"],
+      "mapped_mitre": ["T1046", "T1595"],
+      "severity": "medium",
+      "steps": [
+        "Identify the scanning source and the destination targets.",
+        "Confirm whether any ports were actually open.",
+        "Check for follow-on connection attempts beyond the scan."
+      ],
+      "containment": [
+        "Block the scanning source at the perimeter.",
+        "Confirm exposed services are intentional.",
+        "Increase IDS sensitivity for the targeted subnet."
+      ],
+      "evidence_to_collect": [
+        "Firewall logs for the scanning window.",
+        "Any IDS / NetFlow telemetry."
+      ],
+      "limitations": "This is a local educational playbook using fake data."
+    },
+    {
+      "id": "PB_PRIVILEGE_ESCALATION",
+      "title": "Privilege Escalation Response",
+      "mapped_rules": ["R003", "R018"],
+      "mapped_mitre": ["T1003"],
+      "severity": "high",
+      "steps": [
+        "Audit sudo / privileged commands for the named user.",
+        "Verify the integrity of /etc/shadow and /etc/sudoers.",
+        "Check process and command-line telemetry for the same window."
+      ],
+      "containment": [
+        "Disable the affected user account temporarily.",
+        "Rotate root and service credentials.",
+        "Restore /etc/shadow and /etc/sudoers from a clean backup if modified."
+      ],
+      "evidence_to_collect": [
+        "Auth logs and sudo logs.",
+        "Filesystem audit logs (auditd) for /etc/shadow and /etc/sudoers.",
+        "Endpoint process telemetry."
+      ],
+      "limitations": "This is a local educational playbook using fake data."
+    }
+  ]
+}

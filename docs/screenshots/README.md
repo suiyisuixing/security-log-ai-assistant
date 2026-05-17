@@ -27,3 +27,14 @@ For v2, also capture:
 - `11_coverage_matrix.png` — MITRE coverage at 100%.
 - `12_rule_tuning.png` — per-rule performance.
 - `13_soc_report.png` — generated SOC Markdown report.
+
+## v3 additions
+
+- `14_detection_metrics.png` — precision/recall/F1 KPI tiles.
+- `15_rule_quality.png` — per-rule quality table.
+- `16_dataset_evaluation.png` — dataset list + one analysis result.
+- `17_playbook_recommendations.png` — playbook recommendations.
+- `18_workflow_simulation.png` — case transitions table.
+- `19_report_center_executive.png` — executive Markdown report.
+- `20_report_center_analyst.png` — analyst Markdown report.
+- `21_report_center_de.png` — detection engineering Markdown report.

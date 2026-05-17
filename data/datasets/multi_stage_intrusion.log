@@ -1,0 +1,24 @@
+FW 2026-06-05T11:00:00Z fw DENY src=198.51.100.77 dst=10.0.0.5 proto=TCP sport=40001 dport=22
+FW 2026-06-05T11:00:01Z fw DENY src=198.51.100.77 dst=10.0.0.5 proto=TCP sport=40002 dport=23
+FW 2026-06-05T11:00:02Z fw DENY src=198.51.100.77 dst=10.0.0.5 proto=TCP sport=40003 dport=25
+FW 2026-06-05T11:00:03Z fw DENY src=198.51.100.77 dst=10.0.0.5 proto=TCP sport=40004 dport=80
+FW 2026-06-05T11:00:04Z fw DENY src=198.51.100.77 dst=10.0.0.5 proto=TCP sport=40005 dport=110
+FW 2026-06-05T11:00:05Z fw DENY src=198.51.100.77 dst=10.0.0.5 proto=TCP sport=40006 dport=143
+FW 2026-06-05T11:00:06Z fw DENY src=198.51.100.77 dst=10.0.0.5 proto=TCP sport=40007 dport=443
+FW 2026-06-05T11:00:07Z fw DENY src=198.51.100.77 dst=10.0.0.5 proto=TCP sport=40008 dport=445
+FW 2026-06-05T11:00:08Z fw DENY src=198.51.100.77 dst=10.0.0.5 proto=TCP sport=40009 dport=3306
+WEB 198.51.100.77 - - [05/Jun/2026:11:01:00 +0000] "GET /admin HTTP/1.1" 401 0 "-" "Mozilla/5.0"
+WEB 198.51.100.77 - - [05/Jun/2026:11:01:01 +0000] "GET /wp-admin HTTP/1.1" 404 200 "-" "Mozilla/5.0"
+WEB 198.51.100.77 - - [05/Jun/2026:11:01:05 +0000] "GET /products?id=1' OR '1'='1 HTTP/1.1" 500 200 "-" "sqlmap/1.6"
+WEB 198.51.100.77 - - [05/Jun/2026:11:01:06 +0000] "GET /../../etc/passwd HTTP/1.1" 404 300 "-" "curl/7.85"
+AUTH 2026-06-05T11:02:00Z sshd[5001]: Failed password for invalid user admin from 198.51.100.77 port 51445 ssh2
+AUTH 2026-06-05T11:02:01Z sshd[5002]: Failed password for invalid user admin from 198.51.100.77 port 51446 ssh2
+AUTH 2026-06-05T11:02:02Z sshd[5003]: Failed password for invalid user admin from 198.51.100.77 port 51447 ssh2
+AUTH 2026-06-05T11:02:03Z sshd[5004]: Failed password for invalid user admin from 198.51.100.77 port 51448 ssh2
+AUTH 2026-06-05T11:02:04Z sshd[5005]: Failed password for invalid user admin from 198.51.100.77 port 51449 ssh2
+AUTH 2026-06-05T11:02:30Z sudo[5101]: alice : TTY=pts/0 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/cat /etc/shadow
+DNS 2026-06-05T11:03:00Z dns client=10.0.0.20 query=beacon.evil-c2.example type=A response=NOERROR
+DNS 2026-06-05T11:03:30Z dns client=10.0.0.20 query=beacon.evil-c2.example type=A response=NOERROR
+DNS 2026-06-05T11:04:00Z dns client=10.0.0.20 query=beacon.evil-c2.example type=A response=NOERROR
+DNS 2026-06-05T11:04:30Z dns client=10.0.0.20 query=beacon.evil-c2.example type=A response=NOERROR
+DNS 2026-06-05T11:05:00Z dns client=10.0.0.20 query=beacon.evil-c2.example type=A response=NOERROR
