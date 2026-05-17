@@ -1,0 +1,225 @@
+{
+  "version": "1.0",
+  "rules": [
+    {
+      "id": "R001",
+      "name": "SSH brute force",
+      "description": "Repeated SSH failed logins from the same source IP within a short window.",
+      "source_type": "auth",
+      "match_type": "threshold",
+      "pattern": "Failed password",
+      "group_by": "source_ip",
+      "threshold": 5,
+      "window_seconds": 120,
+      "severity": "high",
+      "mitre": ["T1110"]
+    },
+    {
+      "id": "R002",
+      "name": "Invalid user login",
+      "description": "Login attempt with an invalid or non-existent username.",
+      "source_type": "auth",
+      "match_type": "regex",
+      "pattern": "Failed password for invalid user",
+      "severity": "medium",
+      "mitre": ["T1110", "T1087"]
+    },
+    {
+      "id": "R003",
+      "name": "Sudo sensitive file access",
+      "description": "Use of sudo to access sensitive files such as /etc/shadow or /etc/sudoers.",
+      "source_type": "auth",
+      "match_type": "regex",
+      "pattern": "sudo.*(/etc/shadow|/etc/sudoers|/etc/passwd)",
+      "severity": "high",
+      "mitre": ["T1003"]
+    },
+    {
+      "id": "R004",
+      "name": "SQL injection attempt",
+      "description": "Classic SQL injection patterns in HTTP request.",
+      "source_type": "web",
+      "match_type": "regex",
+      "pattern": "(?i)(union\\s+select|or\\s+'1'='1|or\\s+1=1|select.+from\\s+\\w+)",
+      "severity": "high",
+      "mitre": ["T1190"]
+    },
+    {
+      "id": "R005",
+      "name": "XSS attempt",
+      "description": "Cross-site scripting payload in HTTP request.",
+      "source_type": "web",
+      "match_type": "regex",
+      "pattern": "(?i)(<script|onerror=|onload=|javascript:)",
+      "severity": "high",
+      "mitre": ["T1190"]
+    },
+    {
+      "id": "R006",
+      "name": "Directory traversal",
+      "description": "Path traversal attempt to access files outside web root.",
+      "source_type": "web",
+      "match_type": "regex",
+      "pattern": "(\\.\\./|\\.\\.%2f|%2e%2e/|/etc/passwd)",
+      "severity": "high",
+      "mitre": ["T1190"]
+    },
+    {
+      "id": "R007",
+      "name": "Admin panel probing",
+      "description": "Requests to common admin/management panel paths.",
+      "source_type": "web",
+      "match_type": "regex",
+      "pattern": "(?i)(/admin|/administrator|/wp-admin|/phpmyadmin|/manager/html)",
+      "severity": "medium",
+      "mitre": ["T1190", "T1595"]
+    },
+    {
+      "id": "R008",
+      "name": "Suspicious scanner user-agent",
+      "description": "User-Agent header matching known scanners (sqlmap, nikto, nmap).",
+      "source_type": "web",
+      "match_type": "regex",
+      "pattern": "(?i)(sqlmap|nikto|nmap|masscan|acunetix)",
+      "severity": "high",
+      "mitre": ["T1595", "T1190"]
+    },
+    {
+      "id": "R009",
+      "name": "Curl suspicious access",
+      "description": "curl/wget user agent accessing sensitive paths.",
+      "source_type": "web",
+      "match_type": "regex",
+      "pattern": "(?i)(?=.*(?:curl|wget))(?=.*(?:/etc/passwd|/\\.env|\\.git/config))",
+      "severity": "medium",
+      "mitre": ["T1595"]
+    },
+    {
+      "id": "R010",
+      "name": "Port scan",
+      "description": "Many denied connections to many distinct destination ports from one source.",
+      "source_type": "firewall",
+      "match_type": "port_scan",
+      "group_by": "source_ip",
+      "distinct_field": "dest_port",
+      "threshold": 8,
+      "window_seconds": 60,
+      "severity": "high",
+      "mitre": ["T1046", "T1595"]
+    },
+    {
+      "id": "R011",
+      "name": "Repeated firewall deny",
+      "description": "Repeated DENY events from the same source IP within a short window.",
+      "source_type": "firewall",
+      "match_type": "threshold",
+      "pattern": "DENY",
+      "group_by": "source_ip",
+      "threshold": 5,
+      "window_seconds": 60,
+      "severity": "medium",
+      "mitre": ["T1595"]
+    },
+    {
+      "id": "R012",
+      "name": "Suspicious outbound connection",
+      "description": "Outbound ALLOW to a non-standard port that looks like C2 (e.g., 4444, 1337, 8081 with periodic pattern).",
+      "source_type": "firewall",
+      "match_type": "regex",
+      "pattern": "ALLOW.*dport=(4444|1337|6667|31337)",
+      "severity": "high",
+      "mitre": ["T1071", "T1105"]
+    },
+    {
+      "id": "R013",
+      "name": "DGA-like DNS query",
+      "description": "DNS query for a domain with a long random-looking subdomain (DGA indicator).",
+      "source_type": "dns",
+      "match_type": "dga",
+      "min_length": 15,
+      "severity": "medium",
+      "mitre": ["T1071"]
+    },
+    {
+      "id": "R014",
+      "name": "Repeated NXDOMAIN",
+      "description": "Many NXDOMAIN responses for the same client within a short window.",
+      "source_type": "dns",
+      "match_type": "threshold",
+      "pattern": "NXDOMAIN",
+      "group_by": "client",
+      "threshold": 5,
+      "window_seconds": 60,
+      "severity": "medium",
+      "mitre": ["T1071"]
+    },
+    {
+      "id": "R015",
+      "name": "C2-like beacon pattern",
+      "description": "Repeated DNS queries to the same suspicious domain at regular intervals.",
+      "source_type": "dns",
+      "match_type": "beacon",
+      "group_by": "query",
+      "threshold": 4,
+      "window_seconds": 600,
+      "severity": "high",
+      "mitre": ["T1071", "T1105"]
+    },
+    {
+      "id": "R016",
+      "name": "Web 404 scan burst",
+      "description": "Many 404 responses from the same source IP in a short window.",
+      "source_type": "web",
+      "match_type": "threshold",
+      "pattern": "\" 404 ",
+      "group_by": "source_ip",
+      "threshold": 5,
+      "window_seconds": 60,
+      "severity": "medium",
+      "mitre": ["T1595"]
+    },
+    {
+      "id": "R017",
+      "name": "Suspicious encoded payload",
+      "description": "Detect URL-encoded payloads commonly used for evasion.",
+      "source_type": "web",
+      "match_type": "regex",
+      "pattern": "(%2e%2e|%252e|%00|%27%20OR)",
+      "severity": "medium",
+      "mitre": ["T1190"]
+    },
+    {
+      "id": "R018",
+      "name": "Credential dumping hint",
+      "description": "Access to credential stores like /etc/shadow or SAM hive.",
+      "source_type": "auth",
+      "match_type": "regex",
+      "pattern": "(/etc/shadow|SAM\\\\system|lsass\\.exe)",
+      "severity": "high",
+      "mitre": ["T1003"]
+    },
+    {
+      "id": "R019",
+      "name": "Command execution probe",
+      "description": "Possible command injection patterns in HTTP request.",
+      "source_type": "web",
+      "match_type": "regex",
+      "pattern": "(?i)(;\\s*cat\\s+/etc/passwd|\\$\\(id\\)|\\|whoami|;\\s*ls\\s+-la)",
+      "severity": "high",
+      "mitre": ["T1059", "T1190"]
+    },
+    {
+      "id": "R020",
+      "name": "Broad scanning pattern",
+      "description": "Many distinct request paths from a single source IP in a short window.",
+      "source_type": "web",
+      "match_type": "path_scan",
+      "group_by": "source_ip",
+      "distinct_field": "path",
+      "threshold": 8,
+      "window_seconds": 60,
+      "severity": "medium",
+      "mitre": ["T1595"]
+    }
+  ]
+}

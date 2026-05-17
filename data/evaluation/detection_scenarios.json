@@ -1,0 +1,145 @@
+{
+  "version": "1.0",
+  "description": "Detection evaluation scenarios. Each scenario provides log content and expected rule IDs that should match.",
+  "scenarios": [
+    {
+      "id": "detect_ssh_bruteforce",
+      "name": "Detect SSH brute force",
+      "source_type": "auth",
+      "log_lines": [
+        "2026-05-10T08:05:11Z sshd[1004]: Failed password for invalid user admin from 198.51.100.23 port 51445 ssh2",
+        "2026-05-10T08:05:12Z sshd[1005]: Failed password for invalid user admin from 198.51.100.23 port 51446 ssh2",
+        "2026-05-10T08:05:13Z sshd[1006]: Failed password for invalid user admin from 198.51.100.23 port 51447 ssh2",
+        "2026-05-10T08:05:14Z sshd[1007]: Failed password for invalid user admin from 198.51.100.23 port 51448 ssh2",
+        "2026-05-10T08:05:15Z sshd[1008]: Failed password for invalid user admin from 198.51.100.23 port 51449 ssh2",
+        "2026-05-10T08:05:16Z sshd[1009]: Failed password for invalid user root from 198.51.100.23 port 51450 ssh2"
+      ],
+      "expected_rule_ids": ["R001", "R002"]
+    },
+    {
+      "id": "detect_invalid_user_login",
+      "name": "Detect invalid user login",
+      "source_type": "auth",
+      "log_lines": [
+        "2026-05-10T08:05:11Z sshd[1004]: Failed password for invalid user admin from 198.51.100.23 port 51445 ssh2"
+      ],
+      "expected_rule_ids": ["R002"]
+    },
+    {
+      "id": "detect_sudo_sensitive_file_access",
+      "name": "Detect sudo sensitive file access",
+      "source_type": "auth",
+      "log_lines": [
+        "2026-05-10T08:07:01Z sudo[2001]: alice : TTY=pts/0 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/cat /etc/shadow"
+      ],
+      "expected_rule_ids": ["R003", "R018"]
+    },
+    {
+      "id": "detect_sql_injection",
+      "name": "Detect SQL injection",
+      "source_type": "web",
+      "log_lines": [
+        "198.51.100.23 - - [10/May/2026:08:01:12 +0000] \"GET /products?id=1' OR '1'='1 HTTP/1.1\" 500 200 \"-\" \"sqlmap/1.6\""
+      ],
+      "expected_rule_ids": ["R004", "R008"]
+    },
+    {
+      "id": "detect_xss_attempt",
+      "name": "Detect XSS attempt",
+      "source_type": "web",
+      "log_lines": [
+        "198.51.100.23 - - [10/May/2026:08:01:14 +0000] \"GET /search?q=<script>alert(1)</script> HTTP/1.1\" 200 320 \"-\" \"Mozilla/5.0\""
+      ],
+      "expected_rule_ids": ["R005"]
+    },
+    {
+      "id": "detect_directory_traversal",
+      "name": "Detect directory traversal",
+      "source_type": "web",
+      "log_lines": [
+        "198.51.100.23 - - [10/May/2026:08:01:20 +0000] \"GET /../../etc/passwd HTTP/1.1\" 404 300 \"-\" \"curl/7.85\""
+      ],
+      "expected_rule_ids": ["R006", "R009"]
+    },
+    {
+      "id": "detect_admin_panel_probe",
+      "name": "Detect admin panel probing",
+      "source_type": "web",
+      "log_lines": [
+        "198.51.100.23 - - [10/May/2026:08:01:30 +0000] \"GET /admin HTTP/1.1\" 401 0 \"-\" \"Mozilla/5.0\"",
+        "198.51.100.23 - - [10/May/2026:08:01:31 +0000] \"GET /wp-admin HTTP/1.1\" 404 200 \"-\" \"Mozilla/5.0\"",
+        "198.51.100.23 - - [10/May/2026:08:01:32 +0000] \"GET /phpmyadmin HTTP/1.1\" 404 200 \"-\" \"Mozilla/5.0\""
+      ],
+      "expected_rule_ids": ["R007"]
+    },
+    {
+      "id": "detect_port_scan",
+      "name": "Detect port scan",
+      "source_type": "firewall",
+      "log_lines": [
+        "2026-05-10T08:01:00Z fw DENY src=198.51.100.23 dst=10.0.0.5 proto=TCP sport=40001 dport=22",
+        "2026-05-10T08:01:01Z fw DENY src=198.51.100.23 dst=10.0.0.5 proto=TCP sport=40002 dport=23",
+        "2026-05-10T08:01:02Z fw DENY src=198.51.100.23 dst=10.0.0.5 proto=TCP sport=40003 dport=25",
+        "2026-05-10T08:01:03Z fw DENY src=198.51.100.23 dst=10.0.0.5 proto=TCP sport=40004 dport=80",
+        "2026-05-10T08:01:04Z fw DENY src=198.51.100.23 dst=10.0.0.5 proto=TCP sport=40005 dport=110",
+        "2026-05-10T08:01:05Z fw DENY src=198.51.100.23 dst=10.0.0.5 proto=TCP sport=40006 dport=143",
+        "2026-05-10T08:01:06Z fw DENY src=198.51.100.23 dst=10.0.0.5 proto=TCP sport=40007 dport=443",
+        "2026-05-10T08:01:07Z fw DENY src=198.51.100.23 dst=10.0.0.5 proto=TCP sport=40008 dport=445",
+        "2026-05-10T08:01:08Z fw DENY src=198.51.100.23 dst=10.0.0.5 proto=TCP sport=40009 dport=3306"
+      ],
+      "expected_rule_ids": ["R010", "R011"]
+    },
+    {
+      "id": "detect_firewall_repeated_deny",
+      "name": "Detect repeated firewall deny",
+      "source_type": "firewall",
+      "log_lines": [
+        "2026-05-10T08:02:00Z fw DENY src=198.51.100.50 dst=10.0.0.5 proto=TCP sport=41000 dport=22",
+        "2026-05-10T08:02:01Z fw DENY src=198.51.100.50 dst=10.0.0.5 proto=TCP sport=41001 dport=22",
+        "2026-05-10T08:02:02Z fw DENY src=198.51.100.50 dst=10.0.0.5 proto=TCP sport=41002 dport=22",
+        "2026-05-10T08:02:03Z fw DENY src=198.51.100.50 dst=10.0.0.5 proto=TCP sport=41003 dport=22",
+        "2026-05-10T08:02:04Z fw DENY src=198.51.100.50 dst=10.0.0.5 proto=TCP sport=41004 dport=22",
+        "2026-05-10T08:02:05Z fw DENY src=198.51.100.50 dst=10.0.0.5 proto=TCP sport=41005 dport=22"
+      ],
+      "expected_rule_ids": ["R011"]
+    },
+    {
+      "id": "detect_suspicious_dns",
+      "name": "Detect suspicious DNS NXDOMAIN burst",
+      "source_type": "dns",
+      "log_lines": [
+        "2026-05-10T08:02:00Z dns client=10.0.0.30 query=nonexistent1.example type=A response=NXDOMAIN",
+        "2026-05-10T08:02:01Z dns client=10.0.0.30 query=nonexistent2.example type=A response=NXDOMAIN",
+        "2026-05-10T08:02:02Z dns client=10.0.0.30 query=nonexistent3.example type=A response=NXDOMAIN",
+        "2026-05-10T08:02:03Z dns client=10.0.0.30 query=nonexistent4.example type=A response=NXDOMAIN",
+        "2026-05-10T08:02:04Z dns client=10.0.0.30 query=nonexistent5.example type=A response=NXDOMAIN",
+        "2026-05-10T08:02:05Z dns client=10.0.0.30 query=nonexistent6.example type=A response=NXDOMAIN"
+      ],
+      "expected_rule_ids": ["R014"]
+    },
+    {
+      "id": "detect_dga_like_domain",
+      "name": "Detect DGA-like domain",
+      "source_type": "dns",
+      "log_lines": [
+        "2026-05-10T08:01:00Z dns client=10.0.0.20 query=xkjqwzpvbnmlkjhgfd.suspicious-domain.top type=A response=NOERROR"
+      ],
+      "expected_rule_ids": ["R013"]
+    },
+    {
+      "id": "detect_mixed_multistage_activity",
+      "name": "Detect mixed multistage activity",
+      "source_type": "mixed",
+      "log_lines": [
+        "AUTH 2026-05-10T08:05:11Z sshd[1004]: Failed password for invalid user admin from 198.51.100.23 port 51445 ssh2",
+        "AUTH 2026-05-10T08:05:12Z sshd[1005]: Failed password for invalid user admin from 198.51.100.23 port 51446 ssh2",
+        "AUTH 2026-05-10T08:05:13Z sshd[1006]: Failed password for invalid user admin from 198.51.100.23 port 51447 ssh2",
+        "AUTH 2026-05-10T08:05:14Z sshd[1007]: Failed password for invalid user admin from 198.51.100.23 port 51448 ssh2",
+        "AUTH 2026-05-10T08:05:15Z sshd[1008]: Failed password for invalid user admin from 198.51.100.23 port 51449 ssh2",
+        "WEB 198.51.100.23 - - [10/May/2026:08:01:12 +0000] \"GET /products?id=1' OR '1'='1 HTTP/1.1\" 500 200 \"-\" \"sqlmap/1.6\"",
+        "WEB 198.51.100.23 - - [10/May/2026:08:01:20 +0000] \"GET /../../etc/passwd HTTP/1.1\" 404 300 \"-\" \"curl/7.85\""
+      ],
+      "expected_rule_ids": ["R001", "R002", "R004", "R006", "R008"]
+    }
+  ]
+}

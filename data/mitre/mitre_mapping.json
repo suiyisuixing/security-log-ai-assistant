@@ -1,0 +1,78 @@
+{
+  "source": "Local simplified MITRE ATT&CK mapping (no external fetch). Used for educational/demo purposes.",
+  "version": "local-1.0",
+  "techniques": {
+    "T1110": {
+      "id": "T1110",
+      "name": "Brute Force",
+      "tactic": "Credential Access",
+      "description": "Adversaries may use brute force techniques to gain access to accounts when passwords are unknown or when password hashes are obtained."
+    },
+    "T1059": {
+      "id": "T1059",
+      "name": "Command and Scripting Interpreter",
+      "tactic": "Execution",
+      "description": "Adversaries may abuse command and script interpreters to execute commands, scripts, or binaries."
+    },
+    "T1190": {
+      "id": "T1190",
+      "name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access",
+      "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program."
+    },
+    "T1087": {
+      "id": "T1087",
+      "name": "Account Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may attempt to get a listing of accounts on a system or within an environment."
+    },
+    "T1046": {
+      "id": "T1046",
+      "name": "Network Service Discovery",
+      "tactic": "Discovery",
+      "description": "Adversaries may attempt to get a listing of services running on remote hosts and local network infrastructure devices."
+    },
+    "T1021": {
+      "id": "T1021",
+      "name": "Remote Services",
+      "tactic": "Lateral Movement",
+      "description": "Adversaries may use valid accounts to log into a service that accepts remote connections."
+    },
+    "T1071": {
+      "id": "T1071",
+      "name": "Application Layer Protocol",
+      "tactic": "Command and Control",
+      "description": "Adversaries may communicate using application layer protocols to avoid detection by blending in with existing traffic."
+    },
+    "T1105": {
+      "id": "T1105",
+      "name": "Ingress Tool Transfer",
+      "tactic": "Command and Control",
+      "description": "Adversaries may transfer tools or other files from an external system into a compromised environment."
+    },
+    "T1003": {
+      "id": "T1003",
+      "name": "OS Credential Dumping",
+      "tactic": "Credential Access",
+      "description": "Adversaries may attempt to dump credentials to obtain account login and credential material."
+    },
+    "T1055": {
+      "id": "T1055",
+      "name": "Process Injection",
+      "tactic": "Defense Evasion",
+      "description": "Adversaries may inject code into processes in order to evade process-based defenses as well as possibly elevate privileges."
+    },
+    "T1566": {
+      "id": "T1566",
+      "name": "Phishing",
+      "tactic": "Initial Access",
+      "description": "Adversaries may send phishing messages to gain access to victim systems."
+    },
+    "T1595": {
+      "id": "T1595",
+      "name": "Active Scanning",
+      "tactic": "Reconnaissance",
+      "description": "Adversaries may execute active reconnaissance scans to gather information that can be used during targeting."
+    }
+  }
+}

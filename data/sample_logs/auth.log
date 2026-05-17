@@ -1,0 +1,20 @@
+2026-05-10T08:01:11Z sshd[1001]: Accepted password for alice from 192.0.2.10 port 51322 ssh2
+2026-05-10T08:02:43Z sshd[1002]: Accepted publickey for bob from 192.0.2.11 port 51330 ssh2
+2026-05-10T08:05:09Z sshd[1003]: Failed password for invalid user admin from 198.51.100.23 port 51444 ssh2
+2026-05-10T08:05:11Z sshd[1004]: Failed password for invalid user admin from 198.51.100.23 port 51445 ssh2
+2026-05-10T08:05:12Z sshd[1005]: Failed password for invalid user admin from 198.51.100.23 port 51446 ssh2
+2026-05-10T08:05:13Z sshd[1006]: Failed password for invalid user admin from 198.51.100.23 port 51447 ssh2
+2026-05-10T08:05:14Z sshd[1007]: Failed password for invalid user admin from 198.51.100.23 port 51448 ssh2
+2026-05-10T08:05:15Z sshd[1008]: Failed password for invalid user root from 198.51.100.23 port 51449 ssh2
+2026-05-10T08:05:16Z sshd[1009]: Failed password for invalid user root from 198.51.100.23 port 51450 ssh2
+2026-05-10T08:05:17Z sshd[1010]: Failed password for invalid user oracle from 198.51.100.23 port 51451 ssh2
+2026-05-10T08:05:18Z sshd[1011]: Failed password for invalid user postgres from 198.51.100.23 port 51452 ssh2
+2026-05-10T08:05:19Z sshd[1012]: Failed password for invalid user test from 198.51.100.23 port 51453 ssh2
+2026-05-10T08:07:01Z sudo[2001]: alice : TTY=pts/0 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/cat /etc/shadow
+2026-05-10T08:07:30Z sudo[2002]: alice : TTY=pts/0 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/vim /etc/sudoers
+2026-05-10T08:08:14Z sshd[1013]: Accepted password for alice from 203.0.113.77 port 60001 ssh2
+2026-05-10T08:08:20Z sshd[1014]: Accepted password for alice from 192.0.2.10 port 51500 ssh2
+2026-05-10T08:09:55Z sshd[1015]: Failed password for invalid user backup from 198.51.100.50 port 51500 ssh2
+2026-05-10T08:09:57Z sshd[1016]: Failed password for invalid user guest from 198.51.100.50 port 51501 ssh2
+2026-05-10T08:10:01Z sudo[2003]: bob : TTY=pts/1 ; PWD=/home/bob ; USER=root ; COMMAND=/usr/sbin/useradd attacker
+2026-05-10T08:12:23Z sshd[1017]: Accepted publickey for carol from 192.0.2.15 port 51600 ssh2
