@@ -100,3 +100,101 @@ class DashboardSummary(BaseModel):
     top_rules: List[Dict[str, Any]]
     top_source_ips: List[Dict[str, Any]]
     techniques: List[str]
+
+
+class FalsePositiveAssessment(BaseModel):
+    likelihood: str
+    score: int
+    reasons: List[str] = Field(default_factory=list)
+
+
+class Alert(BaseModel):
+    alert_id: str
+    finding_id: str
+    rule_id: str
+    title: str
+    severity: str
+    status: str = "open"
+    priority: str = "P4"
+    src_ips: List[str] = Field(default_factory=list)
+    mitre_techniques: List[str] = Field(default_factory=list)
+    risk_score: int = 0
+    created_at: str
+    recommended_action: str = ""
+    triage_reason: str = ""
+    false_positive: Optional[FalsePositiveAssessment] = None
+
+
+class Case(BaseModel):
+    case_id: str
+    title: str
+    severity: str
+    status: str = "open"
+    priority: str = "P4"
+    src_ips: List[str] = Field(default_factory=list)
+    related_alert_ids: List[str] = Field(default_factory=list)
+    mitre_techniques: List[str] = Field(default_factory=list)
+    summary: str = ""
+    recommended_actions: List[str] = Field(default_factory=list)
+    created_at: str
+    case_type: str = "unknown"
+
+
+class EntityProfile(BaseModel):
+    entity_id: str
+    entity_type: str
+    risk_score: int = 0
+    severity: str = "informational"
+    event_count: int = 0
+    finding_count: int = 0
+    alert_count: int = 0
+    mitre_techniques: List[str] = Field(default_factory=list)
+    first_seen: Optional[str] = None
+    last_seen: Optional[str] = None
+    observations: List[str] = Field(default_factory=list)
+
+
+class KillChainStage(BaseModel):
+    stage: str
+    findings: List[Finding] = Field(default_factory=list)
+    mitre_techniques: List[str] = Field(default_factory=list)
+    observed: bool = False
+    finding_count: int = 0
+
+
+class KillChainView(BaseModel):
+    stages: List[KillChainStage]
+    observed_stage_count: int
+    highest_stage: Optional[str] = None
+    narrative: str
+
+
+class CoverageEntry(BaseModel):
+    technique_id: str
+    technique_name: str
+    tactic: str
+    covered: bool
+    rule_ids: List[str] = Field(default_factory=list)
+    coverage_strength: str = "none"
+
+
+class RulePerformance(BaseModel):
+    rule_id: str
+    triggered_count: int = 0
+    expected_count: int = 0
+    missed_count: int = 0
+    possible_overtrigger: int = 0
+    tuning_recommendation: str = ""
+
+
+class TuningRecommendation(BaseModel):
+    rule_id: str
+    recommendation_type: str
+    reason: str
+    suggested_change: str
+
+
+class DetectionGap(BaseModel):
+    scenario_id: str
+    missing_rule_ids: List[str]
+    note: str

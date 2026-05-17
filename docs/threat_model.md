@@ -33,6 +33,14 @@ returns structured findings.
 | T07 | Accidental secret commit | `.gitignore` excludes `.env`, secret scan in security tests. |
 | T08 | Sample logs leaking real data | All IPs are RFC 5737; domains are clearly synthetic (`.example`). |
 
+## v2 surface additions
+
+The v2 endpoints (`/triage`, `/cases`, `/false-positive`, `/rules/tuning`,
+`/entities`, `/kill-chain`, `/coverage`, `/report/soc-*`) re-use the same
+parsing + detection pipeline. They add no new file I/O paths beyond the
+existing whitelisted sample reads. Recommended actions inside cases are
+static templates and are never executed.
+
 ## Out of scope
 
 - Multi-user auth and RBAC.

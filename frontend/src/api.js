@@ -34,4 +34,25 @@ export const api = {
   runScenario: (id) => jsonRequest(`/evaluation/run-one/${encodeURIComponent(id)}`, { method: 'POST' }),
   dashboardSummary: () => jsonRequest('/dashboard/summary'),
   apiSurface: () => jsonRequest('/api/surface'),
+  // v2
+  triageSample: () => jsonRequest('/triage/sample'),
+  triageAnalyze: (logType, raw, includeCorrelation = true) =>
+    jsonRequest('/triage/analyze', { method: 'POST', body: JSON.stringify({ log_type: logType, raw_logs: raw, include_correlation: includeCorrelation }) }),
+  casesSample: () => jsonRequest('/cases/sample'),
+  casesFromAnalysis: (logType, raw, includeCorrelation = true) =>
+    jsonRequest('/cases/from-analysis', { method: 'POST', body: JSON.stringify({ log_type: logType, raw_logs: raw, include_correlation: includeCorrelation }) }),
+  falsePositiveReview: (logType, raw) =>
+    jsonRequest('/false-positive/review', { method: 'POST', body: JSON.stringify({ log_type: logType, raw_logs: raw }) }),
+  rulesTuning: () => jsonRequest('/rules/tuning'),
+  entitiesSample: () => jsonRequest('/entities/sample'),
+  entitiesAnalyze: (logType, raw) =>
+    jsonRequest('/entities/analyze', { method: 'POST', body: JSON.stringify({ log_type: logType, raw_logs: raw }) }),
+  killChainSample: () => jsonRequest('/kill-chain/sample'),
+  killChainAnalyze: (logType, raw, includeCorrelation = true) =>
+    jsonRequest('/kill-chain/analyze', { method: 'POST', body: JSON.stringify({ log_type: logType, raw_logs: raw, include_correlation: includeCorrelation }) }),
+  coverageMitre: () => jsonRequest('/coverage/mitre'),
+  reportSocJson: (sourceType, raw) =>
+    jsonRequest('/report/soc-json', { method: 'POST', body: JSON.stringify({ source_type: sourceType, raw_logs: raw }) }),
+  reportSocMarkdown: (sourceType, raw) =>
+    jsonRequest('/report/soc-markdown', { method: 'POST', body: JSON.stringify({ source_type: sourceType, raw_logs: raw }) }),
 }

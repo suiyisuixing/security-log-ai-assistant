@@ -55,6 +55,19 @@ otherwise    -> informational
 
 `overall = round(0.7 * max(finding_scores) + 0.3 * mean(finding_scores))`
 
+## v2 additions
+
+- Each finding is converted into an `Alert` with a P1-P4 priority.
+- A `false_positive` heuristic produces a `(likelihood, score, reasons)`
+  triple per alert.
+- `rule_tuning.analyze_rule_performance(evaluation)` aggregates per-rule
+  `triggered`, `expected`, `missed`, and `possible_overtrigger` counts.
+- `coverage.build_detection_coverage_matrix()` maps each MITRE technique
+  to the rule IDs that reference it (`strong` = 2+ rules; `partial` = 1
+  rule; `none` = no rule).
+- `kill_chain.build_kill_chain_view()` projects findings onto an
+  11-stage canonical kill chain via the MITRE tactic of each technique.
+
 ## Evaluation
 
 Each scenario in `data/evaluation/detection_scenarios.json` declares an

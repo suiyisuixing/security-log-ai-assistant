@@ -38,6 +38,13 @@
 | `correlation.py` | Group findings by source IP into incidents |
 | `reporting.py` | Build full `IncidentReport` and render Markdown |
 | `evaluation.py` | Run named detection scenarios with expected rule IDs |
+| `triage.py` | (v2) Alert generation + priority + queue summary + filtering |
+| `cases.py` | (v2) Case classification and recommended actions |
+| `false_positive.py` | (v2) FP likelihood scoring + review summary |
+| `rule_tuning.py` | (v2) Per-rule performance + tuning + detection gaps |
+| `entities.py` | (v2) Entity risk profiles for IP/user/domain/path |
+| `kill_chain.py` | (v2) Kill-chain stage mapping from MITRE tactics |
+| `coverage.py` | (v2) MITRE coverage matrix + summary |
 | `main.py` | FastAPI app, endpoint declarations, CORS, exception mapping |
 
 ## Data flow

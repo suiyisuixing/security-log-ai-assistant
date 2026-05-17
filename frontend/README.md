@@ -19,6 +19,16 @@ to the FastAPI backend on http://127.0.0.1:8000.
 npm run build
 ```
 
+## Panels (v1 + v2)
+
+- v1: Backend Status, Disclosure, Reviewer Quick Path, Sample Selector,
+  Raw Log Input, Findings Dashboard, Findings Table, MITRE Mapping,
+  Timeline, Correlated Incidents, AI Summary, Reports, Evaluation,
+  Dashboard Summary.
+- v2: SOC Overview, Alert Triage Queue, Incident Cases, Entity Risk
+  Profiles, Kill Chain View, MITRE Coverage Matrix, Rule Tuning, SOC
+  Report (JSON + Markdown with Copy buttons).
+
 ## Notes
 
 - No charting library is used; cards, tables, and badges only.

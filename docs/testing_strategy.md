@@ -20,10 +20,19 @@
 | `tests/test_evaluation.py` | All scenarios pass; unknown IDs return None |
 | `tests/test_api.py` | FastAPI endpoints (positive and negative cases) |
 | `tests/test_security_boundaries.py` | Path traversal, IP whitelist, key/external-call scans |
+| `tests/test_triage.py` | (v2) Alert generation, priority mapping, queue summary |
+| `tests/test_cases.py` | (v2) Case classification and recommended actions |
+| `tests/test_false_positive.py` | (v2) FP likelihood scoring and annotations |
+| `tests/test_rule_tuning.py` | (v2) Rule performance, recommendations, gaps |
+| `tests/test_entities.py` | (v2) Entity profile shape and risk scoring |
+| `tests/test_kill_chain.py` | (v2) Kill chain mapping and view |
+| `tests/test_coverage.py` | (v2) MITRE coverage matrix |
+| `tests/test_soc_reporting.py` | (v2) SOC report shape and Markdown rendering |
+| `tests/test_api_v2.py` | (v2) All v2 endpoints incl. traversal & header checks |
 
 ## Targets
 
-- 70+ tests.
+- 170+ tests. Current suite: 195 tests.
 - 0 skips and 0 xfails.
 - 100% pass on both Windows and Linux CI runners.
 

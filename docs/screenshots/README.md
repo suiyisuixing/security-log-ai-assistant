@@ -14,3 +14,16 @@ small and easy to clone. To regenerate the screenshots:
    - `05_evaluation_results.png` — all-scenarios-passed view.
 
 Place the PNG files in this directory.
+
+## v2 additions
+
+For v2, also capture:
+
+- `06_soc_overview.png` — top KPI tiles after a full load.
+- `07_triage_queue.png` — alerts with priorities and FP likelihoods.
+- `08_cases.png` — classified cases with recommended actions.
+- `09_entity_risk.png` — sorted entity profiles.
+- `10_kill_chain.png` — observed kill-chain stages.
+- `11_coverage_matrix.png` — MITRE coverage at 100%.
+- `12_rule_tuning.png` — per-rule performance.
+- `13_soc_report.png` — generated SOC Markdown report.

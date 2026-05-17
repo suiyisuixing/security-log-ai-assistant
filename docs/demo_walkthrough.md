@@ -52,3 +52,20 @@ All scenarios should pass.
 
 Scroll to the **Dashboard Summary** card. It aggregates findings
 across every bundled sample log.
+
+## v2 — SOC workflow demo
+
+8. Click **Generate Alert Queue** in the Alert Triage Queue panel.
+   Confirm that priorities (P1-P4) and false-positive likelihoods are populated.
+9. Click **Generate Cases** in the Incident Cases panel. Cases are
+   classified (e.g., `web_attack`, `multi_stage_incident`) with
+   recommended actions.
+10. Click **Build Entity Profiles**. Sort visually by risk score
+    descending; confirm high-risk attacker IPs surface to the top.
+11. Click **Build Kill Chain**. Observe which stages were reached.
+12. Click **Load Coverage Matrix**. Confirm 100% MITRE coverage.
+13. Click **Analyze Rule Tuning**. Read the per-rule recommendations
+    and confirm there are no detection gaps.
+14. In the **SOC Report** panel, click **Generate SOC Markdown Report**
+    and **Copy Markdown**. This single document is what a SOC reviewer
+    would receive.

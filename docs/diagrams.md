@@ -47,3 +47,27 @@ rule.match_type
 ```
 informational (blue) < low (green) < medium (yellow) < high (orange) < critical (red)
 ```
+
+## v2 SOC pipeline
+
+```
+Findings -> Alerts -> Cases
+                |        |
+                v        v
+             Entities  KillChain
+                |        |
+                v        v
+            Coverage  RuleTuning
+                |        |
+                +---+----+
+                    v
+              SOC Report (JSON + Markdown)
+```
+
+## Kill-chain stages
+
+```
+reconnaissance -> initial_access -> execution -> persistence ->
+privilege_escalation -> credential_access -> discovery ->
+lateral_movement -> command_and_control -> exfiltration -> impact
+```

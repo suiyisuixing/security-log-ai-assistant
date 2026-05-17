@@ -19,6 +19,19 @@ Base URL during development: `http://127.0.0.1:8000`
 | POST   | `/evaluation/run` | - | summary + per-scenario results |
 | POST   | `/evaluation/run-one/{scenario_id}` | - | one scenario result |
 | GET    | `/dashboard/summary` | - | aggregated stats across all sample logs |
+| GET    | `/triage/sample` | - | alert queue for all bundled sample logs |
+| POST   | `/triage/analyze` | `{log_type, raw_logs, include_correlation}` | alert queue from analyst input |
+| GET    | `/cases/sample` | - | cases for all bundled sample logs |
+| POST   | `/cases/from-analysis` | `{log_type, raw_logs, include_correlation}` | cases from analyst input |
+| POST   | `/false-positive/review` | `{log_type, raw_logs}` | FP-annotated alerts |
+| GET    | `/rules/tuning` | - | per-rule performance + tuning + gaps |
+| GET    | `/entities/sample` | - | entity risk profiles for all bundled logs |
+| POST   | `/entities/analyze` | `{log_type, raw_logs}` | entity profiles from analyst input |
+| GET    | `/kill-chain/sample` | - | kill chain view for all bundled logs |
+| POST   | `/kill-chain/analyze` | `{log_type, raw_logs, include_correlation}` | kill chain from analyst input |
+| GET    | `/coverage/mitre` | - | MITRE coverage matrix + summary |
+| POST   | `/report/soc-json` | `{source_type, raw_logs}` | full SOC report (JSON) |
+| POST   | `/report/soc-markdown` | `{source_type, raw_logs}` | full SOC report (Markdown) |
 | GET    | `/api/surface` | - | this endpoint inventory |
 
 ## Errors

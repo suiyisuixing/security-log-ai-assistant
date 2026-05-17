@@ -35,6 +35,8 @@ internet, no persistent storage, and no remote calls. The primary risks are:
 | S2 | No authentication on the API | informational | accepted (local-only) |
 | S3 | Log content reflected in JSON responses | informational | escaped client-side |
 | S4 | Regex DoS surface (catastrophic backtracking) | low | rules use bounded patterns; mitigations recommended for production |
+| S5 | v2 endpoints accept analyst-supplied raw logs | informational | confined to parsing + detection; no eval, no shell |
+| S6 | SOC report includes recommended actions | informational | actions are static templates; never executed |
 
 ## AI-assisted disclosure
 

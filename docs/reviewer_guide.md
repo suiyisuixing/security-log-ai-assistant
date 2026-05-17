@@ -21,9 +21,12 @@ React dashboard.
 
 6. Read `docs/detection_methodology.md` and `docs/mitre_mapping.md`.
 7. Read `docs/threat_model.md` and `reports/SECURITY_REPORT.md`.
-8. Run `pytest` to see all 70+ tests pass.
+8. Run `pytest` to see all 195 tests pass.
 9. Run `python tools/run_checks.py` to also run `compileall` and `npm run build`.
 10. Read `tests/test_security_boundaries.py` for the data hygiene invariants.
+11. Read `docs/soc_workflow.md` to understand the v2 SOC pipeline.
+12. Open the Triage Queue, Cases, Entities, Kill Chain, Coverage, and Tuning panels in the UI.
+13. Generate the SOC Markdown report and read top-to-bottom — it summarizes everything the platform produces.
 
 ## What to look for
 

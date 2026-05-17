@@ -297,7 +297,275 @@ function ReviewerQuickPath() {
         <li>Open the Reports panel and generate the Markdown report to see the AI-style summary.</li>
         <li>Open the Detection Evaluation panel and run all scenarios; expect all to pass.</li>
         <li>Read the Dashboard Summary panel to see aggregated state across all sample logs.</li>
+        <li>v2: open the Alert Triage Queue, Incident Cases, Entity Risk, Kill Chain, MITRE Coverage, Rule Tuning, and SOC Report panels.</li>
       </ol>
+    </div>
+  )
+}
+
+function SocOverview() {
+  const [data, setData] = useState(null)
+  const load = async () => {
+    const [tri, cas, ent, cov, evalRun, dash] = await Promise.all([
+      api.triageSample(),
+      api.casesSample(),
+      api.entitiesSample(),
+      api.coverageMitre(),
+      api.runAllScenarios(),
+      api.dashboardSummary(),
+    ])
+    const highRiskEntities = (ent.entities || []).filter((e) => e.severity === 'high' || e.severity === 'critical').length
+    const highestScore = (ent.entities || []).reduce((m, e) => Math.max(m, e.risk_score), 0)
+    setData({
+      totalAlerts: tri.alerts.length,
+      openCases: (cas.cases || []).filter((c) => c.status === 'open').length,
+      highRiskEntities,
+      coverageRate: cov.coverage_summary.coverage_rate,
+      evalPassRate: evalRun.total ? evalRun.passed / evalRun.total : 0,
+      highestScore,
+      totalFindings: dash.total_findings,
+    })
+  }
+  useEffect(() => { load().catch(() => {}) }, [])
+  if (!data) return <div className="card"><h2>SOC Overview</h2><span className="muted">loading...</span></div>
+  return (
+    <div className="card">
+      <h2>SOC Overview</h2>
+      <div className="grid-4">
+        <div className="metric"><div className="label">Total alerts</div><div className="value">{data.totalAlerts}</div></div>
+        <div className="metric"><div className="label">Open cases</div><div className="value">{data.openCases}</div></div>
+        <div className="metric"><div className="label">High-risk entities</div><div className="value">{data.highRiskEntities}</div></div>
+        <div className="metric"><div className="label">MITRE coverage</div><div className="value">{Math.round(data.coverageRate * 100)}%</div></div>
+        <div className="metric"><div className="label">Eval pass rate</div><div className="value">{Math.round(data.evalPassRate * 100)}%</div></div>
+        <div className="metric"><div className="label">Highest risk score</div><div className="value">{data.highestScore}</div></div>
+        <div className="metric"><div className="label">Total findings</div><div className="value">{data.totalFindings}</div></div>
+      </div>
+    </div>
+  )
+}
+
+function TriageQueuePanel() {
+  const [data, setData] = useState(null)
+  return (
+    <div className="card">
+      <h2>Alert Triage Queue</h2>
+      <button onClick={async () => setData(await api.triageSample())}>Generate Alert Queue</button>
+      {data && (
+        <>
+          <div className="muted" style={{ marginTop: 6 }}>
+            Total: {data.queue_summary.total_alerts} | Open: {data.queue_summary.open_alerts} | Priorities: {JSON.stringify(data.queue_summary.priority_counts)}
+          </div>
+          <table>
+            <thead><tr><th>ID</th><th>Severity</th><th>Priority</th><th>Title</th><th>Src IPs</th><th>MITRE</th><th>Status</th><th>FP likelihood</th></tr></thead>
+            <tbody>
+              {data.alerts.map((a) => (
+                <tr key={a.alert_id}>
+                  <td>{a.alert_id}</td>
+                  <td><Badge value={a.severity} /></td>
+                  <td><span className="pill">{a.priority}</span></td>
+                  <td>{a.title}</td>
+                  <td>{a.src_ips.join(', ')}</td>
+                  <td>{a.mitre_techniques.map((t) => <span key={t} className="pill">{t}</span>)}</td>
+                  <td>{a.status}</td>
+                  <td>{a.false_positive && <Badge value={a.false_positive.likelihood === 'high' ? 'high' : a.false_positive.likelihood === 'medium' ? 'medium' : 'low'} />} <span className="muted">{a.false_positive ? a.false_positive.likelihood : ''}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </div>
+  )
+}
+
+function CasesPanel() {
+  const [data, setData] = useState(null)
+  return (
+    <div className="card">
+      <h2>Incident Cases</h2>
+      <button onClick={async () => setData(await api.casesSample())}>Generate Cases</button>
+      {data && (
+        <>
+          <div className="muted" style={{ marginTop: 6 }}>
+            Total: {data.case_summary.total_cases} | Open: {data.case_summary.open_cases}
+          </div>
+          <table>
+            <thead><tr><th>ID</th><th>Title</th><th>Severity</th><th>Priority</th><th>Type</th><th>Alerts</th><th>Actions</th></tr></thead>
+            <tbody>
+              {data.cases.map((c) => (
+                <tr key={c.case_id}>
+                  <td>{c.case_id}</td>
+                  <td>{c.title}</td>
+                  <td><Badge value={c.severity} /></td>
+                  <td><span className="pill">{c.priority}</span></td>
+                  <td>{c.case_type}</td>
+                  <td>{c.related_alert_ids.length}</td>
+                  <td>
+                    <ul style={{ margin: 0, paddingLeft: 16 }}>
+                      {c.recommended_actions.slice(0, 3).map((a, i) => <li key={i} style={{ fontSize: 11 }}>{a}</li>)}
+                    </ul>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </div>
+  )
+}
+
+function EntityRiskPanel() {
+  const [data, setData] = useState(null)
+  return (
+    <div className="card">
+      <h2>Entity Risk Profiles</h2>
+      <button onClick={async () => setData(await api.entitiesSample())}>Build Entity Profiles</button>
+      {data && (
+        <>
+          <div className="muted" style={{ marginTop: 6 }}>
+            Total: {data.entity_summary.total_entities} | High risk: {data.entity_summary.high_risk_entities}
+          </div>
+          <table>
+            <thead><tr><th>Entity</th><th>Type</th><th>Risk score</th><th>Severity</th><th>Events</th><th>Findings</th><th>Alerts</th><th>MITRE</th></tr></thead>
+            <tbody>
+              {data.entities.slice(0, 30).map((e, i) => (
+                <tr key={i}>
+                  <td>{e.entity_id}</td>
+                  <td>{e.entity_type}</td>
+                  <td>{e.risk_score}</td>
+                  <td><Badge value={e.severity} /></td>
+                  <td>{e.event_count}</td>
+                  <td>{e.finding_count}</td>
+                  <td>{e.alert_count}</td>
+                  <td>{e.mitre_techniques.map((t) => <span key={t} className="pill">{t}</span>)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </div>
+  )
+}
+
+function KillChainPanel() {
+  const [data, setData] = useState(null)
+  return (
+    <div className="card">
+      <h2>Kill Chain View</h2>
+      <button onClick={async () => setData(await api.killChainSample())}>Build Kill Chain</button>
+      {data && (
+        <>
+          <div className="muted" style={{ marginTop: 6 }}>{data.narrative}</div>
+          <table>
+            <thead><tr><th>Observed</th><th>Stage</th><th>Findings</th><th>MITRE techniques</th></tr></thead>
+            <tbody>
+              {data.stages.map((s) => (
+                <tr key={s.stage}>
+                  <td>{s.observed ? <span className="badge passed">yes</span> : <span className="pill">no</span>}</td>
+                  <td>{s.stage}</td>
+                  <td>{s.finding_count}</td>
+                  <td>{s.mitre_techniques.map((t) => <span key={t} className="pill">{t}</span>)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </div>
+  )
+}
+
+function CoveragePanel() {
+  const [data, setData] = useState(null)
+  return (
+    <div className="card">
+      <h2>MITRE Coverage Matrix</h2>
+      <button onClick={async () => setData(await api.coverageMitre())}>Load Coverage Matrix</button>
+      {data && (
+        <>
+          <div className="muted" style={{ marginTop: 6 }}>
+            Coverage rate: {Math.round(data.coverage_summary.coverage_rate * 100)}% ({data.coverage_summary.covered}/{data.coverage_summary.total_techniques})
+          </div>
+          <table>
+            <thead><tr><th>Technique</th><th>Name</th><th>Tactic</th><th>Covered</th><th>Rules</th><th>Strength</th></tr></thead>
+            <tbody>
+              {data.matrix.map((e) => (
+                <tr key={e.technique_id}>
+                  <td>{e.technique_id}</td>
+                  <td>{e.technique_name}</td>
+                  <td>{e.tactic}</td>
+                  <td>{e.covered ? <span className="badge passed">yes</span> : <span className="badge failed">no</span>}</td>
+                  <td>{e.rule_ids.map((r) => <span key={r} className="pill">{r}</span>)}</td>
+                  <td>{e.coverage_strength}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </div>
+  )
+}
+
+function RuleTuningPanel() {
+  const [data, setData] = useState(null)
+  return (
+    <div className="card">
+      <h2>Rule Tuning</h2>
+      <button onClick={async () => setData(await api.rulesTuning())}>Analyze Rule Tuning</button>
+      {data && (
+        <>
+          <h3>Rule performance</h3>
+          <table>
+            <thead><tr><th>Rule</th><th>Triggered</th><th>Expected</th><th>Missed</th><th>Overtrigger</th><th>Recommendation</th></tr></thead>
+            <tbody>
+              {data.rule_performance.map((p) => (
+                <tr key={p.rule_id}>
+                  <td>{p.rule_id}</td>
+                  <td>{p.triggered_count}</td>
+                  <td>{p.expected_count}</td>
+                  <td>{p.missed_count}</td>
+                  <td>{p.possible_overtrigger}</td>
+                  <td style={{ fontSize: 11 }}>{p.tuning_recommendation}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <h3>Tuning recommendations</h3>
+          <ul>
+            {data.tuning_recommendations.map((r, i) => (
+              <li key={i} style={{ fontSize: 12 }}><b>{r.rule_id}</b> [{r.recommendation_type}]: {r.suggested_change}</li>
+            ))}
+          </ul>
+          <h3>Detection gaps</h3>
+          <ul>
+            {data.detection_gaps.length === 0 && <li className="muted">No gaps.</li>}
+            {data.detection_gaps.map((g, i) => (
+              <li key={i} style={{ fontSize: 12 }}>{g.scenario_id}: missing {g.missing_rule_ids.join(', ')}</li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  )
+}
+
+function SocReportPanel({ sourceType, raw }) {
+  const [json, setJson] = useState('')
+  const [markdown, setMarkdown] = useState('')
+  const copy = (txt) => { try { navigator.clipboard.writeText(txt) } catch (e) {} }
+  return (
+    <div className="card">
+      <h2>SOC Report</h2>
+      <button onClick={async () => setJson(JSON.stringify(await api.reportSocJson(sourceType, raw), null, 2))}>Generate SOC JSON Report</button>
+      <button className="secondary" onClick={async () => {
+        const r = await api.reportSocMarkdown(sourceType, raw)
+        setMarkdown(r.markdown)
+      }}>Generate SOC Markdown Report</button>
+      {json && <><h3>SOC JSON <button onClick={() => copy(json)}>Copy JSON</button></h3><pre>{json}</pre></>}
+      {markdown && <><h3>SOC Markdown <button onClick={() => copy(markdown)}>Copy Markdown</button></h3><pre>{markdown}</pre></>}
     </div>
   )
 }
@@ -333,12 +601,13 @@ export default function App() {
   return (
     <div className="container">
       <div className="header">
-        <h1>Security Log AI Assistant</h1>
-        <span className="muted">v1.0-rc</span>
+        <h1>Security Log AI Assistant — SOC Platform</h1>
+        <span className="muted">v2.0-rc</span>
       </div>
       <BackendStatusCard />
       <DisclosureCard />
       <ReviewerQuickPath />
+      <SocOverview />
       <div className="row">
         <SampleSelector samples={samples} selected={selectedSample} onSelect={setSelectedSample} />
         <RawLogInput value={raw} onChange={setRaw} sourceType={sourceType} setSourceType={setSourceType} onAnalyze={runAnalyze} loading={loading} />
@@ -349,7 +618,14 @@ export default function App() {
       <TimelinePanel timeline={report?.timeline} />
       <CorrelatedPanel incidents={report?.correlated_incidents} />
       <AiSummaryPanel summary={report?.ai_summary} />
+      <TriageQueuePanel />
+      <CasesPanel />
+      <EntityRiskPanel />
+      <KillChainPanel />
+      <CoveragePanel />
+      <RuleTuningPanel />
       <ReportsPanel sourceType={sourceType} raw={raw} />
+      <SocReportPanel sourceType={sourceType} raw={raw} />
       <EvaluationPanel />
       <DashboardSummaryPanel />
     </div>
